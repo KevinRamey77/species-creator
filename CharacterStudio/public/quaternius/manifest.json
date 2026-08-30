@@ -1,0 +1,32 @@
+{
+  "assetsLocation": "https://m3-org.github.io/loot-assets/",
+  "traitsDirectory": "/anata/male/",
+  "thumbnailsDirectory": "./loot/thumbnails/",
+  "traitIconsDirectorySvg": "./loot/icons/",
+  "displayScale": 0.8,
+  "offset": [0, 0.12, 0],
+  "requiredTraits": ["Body"],
+  "randomTraits": ["Body"],
+  "initialTraits": ["Body"],
+  "traits": [
+    {
+      "trait": "Body",
+      "name": "Body",
+      "iconSvg": "slotBody.svg",
+      "cameraTarget": {
+        "distance": 2.3,
+        "height": 0.8
+      },
+      "collection": [
+        {
+          "id": "adult-human",
+          "name": "Adult Human",
+          "directory": "Quaternius_Test.vrm",
+          "thumbnail": "../assets/portraitImages/male.jpg",
+          "fullDirectory": "../Quaternius_Test.vrm",
+          "fullThumbnail": "../assets/portraitImages/male.jpg"
+        }
+      ]
+    }
+  ]
+}

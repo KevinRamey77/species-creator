@@ -1,0 +1,21 @@
+{
+  "characters": [
+    {
+      "name": "Adult Human",
+      "description": "Male",
+      "portrait": "./assets/portraitImages/male.jpg",
+      "manifest": "./quaternius/manifest.json",
+      "format": "vrm"
+    }
+  ],
+  "loras": [],
+  "sprites": [],
+  "thumbnails": [],
+  "defaultAnimations": [
+    "./sprite-atlas-assets/animations/T-Pose.fbx",
+    "./sprite-atlas-assets/animations/Male_Standing_Pose.fbx",
+    "./sprite-atlas-assets/animations/Male_Standing_Pose_1.fbx",
+    "./sprite-atlas-assets/animations/Male_Sitting_Pose.fbx",
+    "./sprite-atlas-assets/animations/Male_Crouch_Pose.fbx"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "characters": [
+    {
+      "name": "Adult Human",
+      "description": "Male",
+      "portrait": "./assets/portraitImages/male.jpg",
+      "manifest": "./quaternius/manifest.json",
+      "format": "vrm"
+    }
+  ],
+  "loras": [],
+  "sprites": [],
+  "thumbnails": [],
+  "defaultAnimations": []
+}

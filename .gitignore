@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/assets/Animation Library 2.zip
+/assets/Animation Library.zip
+/assets/Fantasy Props 2.zip

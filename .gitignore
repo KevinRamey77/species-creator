@@ -20,6 +20,11 @@
 # production
 /build
 
+# oversized local asset packs; keep these outside GitHub's 100 MB file limit
+/assets/Base Characters.zip
+/assets/Character Outfits.zip
+/assets/Fantasy Props.zip
+
 # misc
 .DS_Store
 *.pem

@@ -12,6 +12,8 @@
     "test:run": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
+    "normalize:quaternius": "node scripts/normalize-quaternius-assets.mjs",
+    "catalog:quaternius": "node scripts/generate-quaternius-catalog.mjs",
     "lint": "npm run lint:js && npm run lint:prettier",
     "lint:js": "eslint --cache --ext .js,.jsx ./src",
     "lint:prettier": "prettier --check \"**/*\" --end-of-line auto",
@@ -49,8 +51,8 @@
     "react-color": "^2.19.3",
     "react-colorful": "^5.6.1",
     "react-dom": "^19.2.4",
-    "react-select": "^5.10.2",
     "react-i18next": "^12.1.5",
+    "react-select": "^5.10.2",
     "sepia-speechrecognition-polyfill": "^1.0.0",
     "short-uuid": "^4.2.0",
     "squaresplit": "^1.0.2",
@@ -88,6 +90,7 @@
     }
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@react-spring/three": "^10.0.3",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

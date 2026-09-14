@@ -909,9 +909,16 @@ function getNodes(parentNode) {
 //     return new Uint8Array(ktx2Data);
 // }
 
-  // Initialize the KTX decoder/compressor
+  // Initialize the KTX decoder/compressor lazily to avoid failing in non-browser/test environments.
 
-const ktxTools = new KTXTools();
+let ktxTools = null;
+
+function getKTXTools() {
+    if (!ktxTools) {
+        ktxTools = new KTXTools();
+    }
+    return ktxTools;
+}
 
 async function imageBitmap2ktx2(image) {
     // Create ImageBitmap from the image
@@ -937,7 +944,7 @@ async function imageBitmap2ktx2(image) {
 
   // Compress the image data to KTX2 format
   // reference https://github.khronos.org/KTX-Software/ktxtools/ktx_create.html
-  const ktx2Data = await ktxTools.compress(pixelData, canvas.width, canvas.height, 4, {
+  const ktx2Data = await getKTXTools().compress(pixelData, canvas.width, canvas.height, 4, {
     //basisu_options: {
         normalMap : false,
 

@@ -22,9 +22,15 @@ import Optimizer from "./pages/Optimizer"
 import Save from "./pages/Save"
 import Wallet from "./pages/Wallet"
 
+export const resolveAssetImportPath = (assetPath) => {
+  const normalized = typeof assetPath === "string" ? assetPath.trim() : ""
+  const safeBase = normalized && normalized !== "undefined" ? normalized : "./"
+  const cleanBase = safeBase.endsWith("/") ? safeBase.slice(0, -1) : safeBase
+  return cleanBase ? `${cleanBase}/manifest.json` : "./manifest.json"
+}
+
 // dynamically import the manifest
-const assetImportPath = import.meta.env.VITE_ASSET_PATH + "/manifest.json"
-//const assetImportPath = "./manifest.json"
+const assetImportPath = resolveAssetImportPath(import.meta.env.VITE_ASSET_PATH)
 
 const cameraDistanceOther = 6
 const centerCameraTargetOther = new THREE.Vector3(0, 0.8, 0)

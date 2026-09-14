@@ -3,15 +3,17 @@ class KtxDecoder {
     constructor (context, externalKtxlib) {
         this.gl = context;
         this.libktx = null;
+        this.initialized = null;
         if (context !== undefined)
         {
-            if (externalKtxlib === undefined && LIBKTX !== undefined)
+            const globalLib = globalThis.LIBKTX ?? (typeof window !== 'undefined' ? window.LIBKTX : undefined);
+            if (externalKtxlib === undefined && globalLib !== undefined)
             {
-                externalKtxlib = LIBKTX;
+                externalKtxlib = globalLib;
             }
             if (externalKtxlib !== undefined)
             {
-                this.initializied = this.init(context, externalKtxlib);
+                this.initialized = this.init(context, externalKtxlib);
             }
             else
             {
@@ -27,7 +29,24 @@ class KtxDecoder {
     }
 
     async init(context, externalKtxlib) {
-        this.libktx = await externalKtxlib({preinitializedWebGLContext: context});
+        if (!context || !context.canvas) {
+            throw new Error('KTX library unavailable: WebGL context is missing a canvas.');
+        }
+
+        if (typeof externalKtxlib === 'function') {
+            this.libktx = await externalKtxlib({preinitializedWebGLContext: context});
+        }
+        else if (externalKtxlib && typeof externalKtxlib === 'object') {
+            this.libktx = externalKtxlib;
+        }
+        else {
+            throw new Error('KTX library unavailable: expected a valid factory function or initialized module object.');
+        }
+
+        if (!this.libktx || !this.libktx.GL || !this.libktx.GL.makeContextCurrent || !this.libktx.GL.createContext) {
+            throw new Error('KTX library unavailable: missing GL runtime API.');
+        }
+
         this.libktx.GL.makeContextCurrent(this.libktx.GL.createContext(context.canvas, { majorVersion: 2.0 }));
     }
 

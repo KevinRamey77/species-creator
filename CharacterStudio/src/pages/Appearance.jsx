@@ -20,6 +20,7 @@ import colorPicker from "../images/color-palette.png"
 import { ChromePicker   } from 'react-color'
 import RightPanel from "../components/RightPanel"
 import SaleIcon from "../images/sale-icon.png"
+import CatalogAssetPanel from "../components/CatalogAssetPanel"
 
   /**
    * @typedef {import("../library/CharacterManifestData.js").TraitModelsGroup} TraitModelsGroup
@@ -38,6 +39,7 @@ function Appearance() {
     toggleDebugMode,
     characterManager,
     animationManager,
+    assetAssemblyManager,
     moveCamera,
   } = React.useContext(SceneContext)
   
@@ -52,6 +54,7 @@ function Appearance() {
     !isMute && playSound('backNextButton');
     characterManager.removeCurrentCharacter();
     characterManager.removeCurrentManifest();
+    assetAssemblyManager.clear();
     setViewMode(ViewMode.CREATE)
     toggleDebugMode(false);
   }
@@ -287,6 +290,7 @@ function Appearance() {
 
   return (
     <div className={styles.container}>
+      <CatalogAssetPanel />
       <div className={`loadingIndicator ${isLoading ? "active" : ""}`}>
         <img className={"rotate"} src="ui/loading.svg" />
       </div>

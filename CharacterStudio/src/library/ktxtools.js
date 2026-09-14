@@ -4,19 +4,43 @@ export class KTXTools{
     constructor(){
         this.ktxEncoder = null;
         this.libktx = null;
-        this.init();
+        this.ready = null;
     }
 
     async init() {
-        const canvasWebgl = document.createElement('canvas');
-        const gl = canvasWebgl.getContext('webgl'); // WebGL context is needed for KTX operations
-        const ktxEncoder = new KtxDecoder(gl, window.LIBKTX);
-        await ktxEncoder.init(gl, window.LIBKTX);
-        this.ktxEncoder = ktxEncoder;
-        this.libktx = ktxEncoder.libktx;
+        if (this.ready) {
+            return this.ready;
+        }
+
+        this.ready = (async () => {
+            const globalLib = globalThis.LIBKTX ?? (typeof window !== 'undefined' ? window.LIBKTX : undefined);
+            if (!globalLib) {
+                throw new Error('KTX library unavailable in this environment.');
+            }
+
+            const canvasWebgl = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+            const gl = canvasWebgl ? (canvasWebgl.getContext('webgl') || canvasWebgl.getContext('webgl2')) : null;
+            if (!gl) {
+                throw new Error('KTX library unavailable: WebGL context could not be created.');
+            }
+
+            const ktxEncoder = new KtxDecoder(gl, globalLib);
+            await ktxEncoder.init(gl, globalLib);
+            this.ktxEncoder = ktxEncoder;
+            this.libktx = ktxEncoder.libktx;
+            return this;
+        })();
+
+        return this.ready;
     }
 
     async compress(raw_data, width, height, comps, options = {}){
+        await this.init();
+
+        if (!this.libktx || !this.libktx.ktxBasisParams) {
+            throw new Error('KTX library unavailable: missing ktxBasisParams API.');
+        }
+
         const basisu_options = await new this.libktx.ktxBasisParams();
         const userBasisuOptions = options;
 

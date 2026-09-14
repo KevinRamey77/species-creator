@@ -1,3 +1,6 @@
+import { AssetCatalog } from "../library/assetCatalog"
+import { AssetAssemblyManager } from "../library/assetAssemblyManager"
+import { AssetRuntimeLoader } from "../library/assetRuntimeLoader"
 import React, { createContext, useEffect, useState } from "react"
 
 import gsap from "gsap"
@@ -22,6 +25,9 @@ export const SceneContext = createContext({
    */
   // eslint-disable-next-line no-unused-vars
   moveCamera: (_value) => {},
+  assetCatalog: null,
+  assetCatalogLoading: false,
+  assetCatalogError: null,
 })
 
 export const SceneProvider = (props) => {
@@ -36,10 +42,26 @@ export const SceneProvider = (props) => {
   const [scene, setScene] = useState(null)
   const [camera, setCamera] = useState(null)
   const [controls, setControls] = useState(null)
+  const [assetCatalog] = useState(() => new AssetCatalog())
+  const [assetAssemblyManager] = useState(() => new AssetAssemblyManager())
+  const [assetRuntimeLoader] = useState(() => new AssetRuntimeLoader({ baseURL: import.meta.env.BASE_URL }))
+  const [assetCatalogLoading, setAssetCatalogLoading] = useState(true)
+  const [assetCatalogError, setAssetCatalogError] = useState(null)
 
   const [manifest, setManifest] = useState(null)
   const [debugMode, setDebugMode] = useState(false);
   const initRef = React.useRef(false)
+
+  useEffect(() => {
+    const catalogURL = `${import.meta.env.BASE_URL}quaternius/runtime-catalog.json`
+    assetCatalog.load(catalogURL)
+      .catch((error) => {
+        setAssetCatalogError(error)
+      })
+      .finally(() => {
+        setAssetCatalogLoading(false)
+      })
+  }, [assetCatalog])
 
   useEffect(()=>{
     if (initRef.current) return
@@ -63,6 +85,10 @@ export const SceneProvider = (props) => {
     setLoraDataGenerator(new LoraDataGenerator(characterManager))
     setSpriteAtlasGenerator(new SpriteAtlasGenerator(characterManager))
     setThumbnailsGenerator(new ThumbnailGenerator(characterManager))
+    assetAssemblyManager.root = characterManager.characterModel
+    assetAssemblyManager.loader = assetRuntimeLoader
+    assetAssemblyManager.setCatalog(assetCatalog)
+    characterManager.assetAssemblyManager = assetAssemblyManager
   },[])
 
 
@@ -161,6 +187,11 @@ export const SceneProvider = (props) => {
         moveCamera,
         controls,
         sceneElements,
+        assetCatalog,
+        assetCatalogLoading,
+        assetCatalogError,
+          assetAssemblyManager,
+          assetRuntimeLoader,
       }}
     >
       {props.children}

@@ -151,6 +151,7 @@ export class CharacterManager {
      * @param {number} deltaTime - Time elapsed since last update
      */
     update(deltaTime){
+      this.assetAssemblyManager?.update(deltaTime);
       if (this.lookAtManager != null){
         this.lookAtManager.update();
       }

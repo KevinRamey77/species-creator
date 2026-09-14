@@ -1,0 +1,1816 @@
+{
+  "schemaVersion": "1.0",
+  "source": {
+    "id": "quaternius",
+    "name": "Quaternius"
+  },
+  "status": "runtime-normalized",
+  "notes": "Generated from the six uploaded Quaternius source archives.",
+  "assets": [
+    {
+      "id": "quaternius.body.superhero-female",
+      "name": "Superhero Female",
+      "category": "body",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/body/quaternius-body-superhero-female/Superhero_Female_FullBody.gltf",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Base Characters/Godot - UE/Superhero_Female_FullBody.gltf"
+    },
+    {
+      "id": "quaternius.body.superhero-male",
+      "name": "Superhero Male",
+      "category": "body",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody.gltf",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Base Characters/Godot - UE/Superhero_Male_FullBody.gltf"
+    },
+    {
+      "id": "quaternius.hair.eyebrows-female",
+      "name": "Eyebrows Female",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-eyebrows-female/Eyebrows_Female.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Eyebrows_Female.gltf"
+    },
+    {
+      "id": "quaternius.hair.eyebrows-regular",
+      "name": "Eyebrows Regular",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-eyebrows-regular/Eyebrows_Regular.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Eyebrows_Regular.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-beard",
+      "name": "Hair Beard",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-beard/Hair_Beard.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_Beard.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-buns",
+      "name": "Hair Buns",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-buns/Hair_Buns.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_Buns.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-buzzed",
+      "name": "Hair Buzzed",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-buzzed/Hair_Buzzed.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_Buzzed.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-buzzedfemale",
+      "name": "Hair BuzzedFemale",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-buzzedfemale/Hair_BuzzedFemale.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_BuzzedFemale.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-long",
+      "name": "Hair Long",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-long/Hair_Long.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_Long.gltf"
+    },
+    {
+      "id": "quaternius.hair.hair-simpleparted",
+      "name": "Hair SimpleParted",
+      "category": "hair",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/hair/quaternius-hair-hair-simpleparted/Hair_SimpleParted.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female",
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "attachmentBone": "Head",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Base Characters.zip:Universal Base Characters[Standard]/Hairstyles/Rigged to Head Bone/glTF (Godot -Unreal)/Hair_SimpleParted.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-peasant-arms",
+      "name": "Female Peasant Arms",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-peasant-arms/Female_Peasant_Arms.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-arms",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Arms.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-peasant-body",
+      "name": "Female Peasant Body",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-peasant-body/Female_Peasant_Body.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-body",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Body.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-peasant-feet",
+      "name": "Female Peasant Feet",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-peasant-feet/Female_Peasant_Feet.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-feet",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Feet.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-peasant-legs",
+      "name": "Female Peasant Legs",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-peasant-legs/Female_Peasant_Legs.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-legs",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Legs.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-acc-pauldrons",
+      "name": "Female Ranger Acc Pauldrons",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-acc-pauldrons/Female_Ranger_Acc_Pauldrons.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-acc-pauldrons",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Acc_Pauldrons.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-arms",
+      "name": "Female Ranger Arms",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-arms/Female_Ranger_Arms.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-arms",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Arms.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-body",
+      "name": "Female Ranger Body",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-body/Female_Ranger_Body.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-body",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Body.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-feet",
+      "name": "Female Ranger Feet",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-feet/Female_Ranger_Feet.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-feet",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Feet.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-head-hood",
+      "name": "Female Ranger Head Hood",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-head-hood/Female_Ranger_Head_Hood.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-head-hood",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Head_Hood.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger-legs",
+      "name": "Female Ranger Legs",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger-legs/Female_Ranger_Legs.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-legs",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Legs.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-peasant-arms",
+      "name": "Male Peasant Arms",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-peasant-arms/Male_Peasant_Arms.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-arms",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Arms.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-peasant-body",
+      "name": "Male Peasant Body",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-peasant-body/Male_Peasant_Body.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-body",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Body.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-peasant-feet",
+      "name": "Male Peasant Feet",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-peasant-feet/Male_Peasant_Feet.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-feet",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Feet.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-peasant-legs",
+      "name": "Male Peasant Legs",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-peasant-legs/Male_Peasant_Legs.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-legs",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Legs.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-acc-pauldron",
+      "name": "Male Ranger Acc Pauldron",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-acc-pauldron/Male_Ranger_Acc_Pauldron.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-acc-pauldron",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Acc_Pauldron.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-arms",
+      "name": "Male Ranger Arms",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-arms/Male_Ranger_Arms.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-arms",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Arms.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-body",
+      "name": "Male Ranger Body",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-body/Male_Ranger_Body.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-body",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Body.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-feet-boots",
+      "name": "Male Ranger Feet Boots",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-feet-boots/Male_Ranger_Feet_Boots.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-feet",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Feet_Boots.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-head-hood",
+      "name": "Male Ranger Head Hood",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-head-hood/Male_Ranger_Head_Hood.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-head-hood",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Head_Hood.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger-legs",
+      "name": "Male Ranger Legs",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger-legs/Male_Ranger_Legs.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "clothing-legs",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Legs.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-peasant",
+      "name": "Female Peasant",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-peasant/Female_Peasant.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "outfit",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Peasant.gltf"
+    },
+    {
+      "id": "quaternius.clothing.female-ranger",
+      "name": "Female Ranger",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-female-ranger/Female_Ranger.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-female"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "outfit",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Ranger.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-peasant",
+      "name": "Male Peasant",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-peasant/Male_Peasant.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "outfit",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Peasant.gltf"
+    },
+    {
+      "id": "quaternius.clothing.male-ranger",
+      "name": "Male Ranger",
+      "category": "clothing",
+      "source": "quaternius",
+      "format": "gltf",
+      "path": "/quaternius/normalized/clothing/quaternius-clothing-male-ranger/Male_Ranger.gltf",
+      "compatibleBodies": [
+        "quaternius.body.superhero-male"
+      ],
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "slot": "outfit",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Ranger.gltf"
+    },
+    {
+      "id": "quaternius.prop.ring4",
+      "name": "Ring4",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring4/Ring4.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring4.obj"
+    },
+    {
+      "id": "quaternius.prop.skull",
+      "name": "Skull",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-skull/Skull.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Skull.obj"
+    },
+    {
+      "id": "quaternius.prop.sword-big-golden",
+      "name": "Sword big Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-sword-big-golden/Sword_big_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Sword_big_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.sword-big",
+      "name": "Sword big",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-sword-big/Sword_big.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Sword_big.obj"
+    },
+    {
+      "id": "quaternius.prop.skull2",
+      "name": "Skull2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-skull2/Skull2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Skull2.obj"
+    },
+    {
+      "id": "quaternius.prop.snowflake3",
+      "name": "Snowflake3",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-snowflake3/Snowflake3.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Snowflake3.obj"
+    },
+    {
+      "id": "quaternius.prop.ring2",
+      "name": "Ring2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring2/Ring2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring2.obj"
+    },
+    {
+      "id": "quaternius.prop.snowflake1",
+      "name": "Snowflake1",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-snowflake1/Snowflake1.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Snowflake1.obj"
+    },
+    {
+      "id": "quaternius.prop.crown",
+      "name": "Crown",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crown/Crown.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crown.obj"
+    },
+    {
+      "id": "quaternius.prop.ring3",
+      "name": "Ring3",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring3/Ring3.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring3.obj"
+    },
+    {
+      "id": "quaternius.prop.ring7",
+      "name": "Ring7",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring7/Ring7.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring7.obj"
+    },
+    {
+      "id": "quaternius.prop.ring6",
+      "name": "Ring6",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring6/Ring6.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring6.obj"
+    },
+    {
+      "id": "quaternius.prop.snowflake2",
+      "name": "Snowflake2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-snowflake2/Snowflake2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Snowflake2.obj"
+    },
+    {
+      "id": "quaternius.prop.ring1",
+      "name": "Ring1",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring1/Ring1.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring1.obj"
+    },
+    {
+      "id": "quaternius.prop.scroll",
+      "name": "Scroll",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-scroll/Scroll.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Scroll.obj"
+    },
+    {
+      "id": "quaternius.prop.pouch",
+      "name": "Pouch",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-pouch/Pouch.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Pouch.obj"
+    },
+    {
+      "id": "quaternius.prop.potion9-empty",
+      "name": "Potion9 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion9-empty/Potion9_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion9_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.sword",
+      "name": "Sword",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-sword/Sword.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Sword.obj"
+    },
+    {
+      "id": "quaternius.prop.potion9-filled",
+      "name": "Potion9 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion9-filled/Potion9_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion9_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion6-filled",
+      "name": "Potion6 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion6-filled/Potion6_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion6_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion8-empty",
+      "name": "Potion8 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion8-empty/Potion8_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion8_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.star",
+      "name": "Star",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-star/Star.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Star.obj"
+    },
+    {
+      "id": "quaternius.prop.potion8-filled",
+      "name": "Potion8 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion8-filled/Potion8_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion8_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion5-filled",
+      "name": "Potion5 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion5-filled/Potion5_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion5_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion4-empty",
+      "name": "Potion4 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion4-empty/Potion4_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion4_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.potion3-filled",
+      "name": "Potion3 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion3-filled/Potion3_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion3_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion2-filled",
+      "name": "Potion2 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion2-filled/Potion2_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion2_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.mineral",
+      "name": "Mineral",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-mineral/Mineral.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Mineral.obj"
+    },
+    {
+      "id": "quaternius.prop.potion5-empty",
+      "name": "Potion5 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion5-empty/Potion5_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion5_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.potion11-filled",
+      "name": "Potion11 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion11-filled/Potion11_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion11_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion3-empty",
+      "name": "Potion3 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion3-empty/Potion3_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion3_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.gold-ingots",
+      "name": "Gold Ingots",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-gold-ingots/Gold_Ingots.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Gold_Ingots.obj"
+    },
+    {
+      "id": "quaternius.prop.potion11-empty",
+      "name": "Potion11 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion11-empty/Potion11_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion11_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.heart-half",
+      "name": "Heart Half",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-heart-half/Heart_Half.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Heart_Half.obj"
+    },
+    {
+      "id": "quaternius.prop.key4",
+      "name": "Key4",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-key4/Key4.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Key4.obj"
+    },
+    {
+      "id": "quaternius.prop.potion7-filled",
+      "name": "Potion7 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion7-filled/Potion7_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion7_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.potion1-empty",
+      "name": "Potion1 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion1-empty/Potion1_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion1_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.dagger-golden",
+      "name": "Dagger Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-dagger-golden/Dagger_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Dagger_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.parchment",
+      "name": "Parchment",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-parchment/Parchment.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Parchment.obj"
+    },
+    {
+      "id": "quaternius.prop.dart-golden",
+      "name": "Dart Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-dart-golden/Dart_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Dart_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.glove",
+      "name": "Glove",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-glove/Glove.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Glove.obj"
+    },
+    {
+      "id": "quaternius.prop.padlock",
+      "name": "Padlock",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-padlock/Padlock.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Padlock.obj"
+    },
+    {
+      "id": "quaternius.prop.key2",
+      "name": "Key2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-key2/Key2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Key2.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal5",
+      "name": "Crystal5",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal5/Crystal5.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal5.obj"
+    },
+    {
+      "id": "quaternius.prop.necklace1",
+      "name": "Necklace1",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-necklace1/Necklace1.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Necklace1.obj"
+    },
+    {
+      "id": "quaternius.prop.hammer-double-golden",
+      "name": "Hammer Double Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-hammer-double-golden/Hammer_Double_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Hammer_Double_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal4",
+      "name": "Crystal4",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal4/Crystal4.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal4.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal5-damaged",
+      "name": "Crystal5 Damaged",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal5-damaged/Crystal5_Damaged.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal5_Damaged.obj"
+    },
+    {
+      "id": "quaternius.prop.heart-broken",
+      "name": "Heart Broken",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-heart-broken/Heart_Broken.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Heart_Broken.obj"
+    },
+    {
+      "id": "quaternius.prop.potion10-filled",
+      "name": "Potion10 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion10-filled/Potion10_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion10_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.hammer-double",
+      "name": "Hammer Double",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-hammer-double/Hammer_Double.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Hammer_Double.obj"
+    },
+    {
+      "id": "quaternius.prop.necklace2",
+      "name": "Necklace2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-necklace2/Necklace2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Necklace2.obj"
+    },
+    {
+      "id": "quaternius.prop.fishbone",
+      "name": "FishBone",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-fishbone/FishBone.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/FishBone.obj"
+    },
+    {
+      "id": "quaternius.prop.dagger",
+      "name": "Dagger",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-dagger/Dagger.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Dagger.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal1-damaged",
+      "name": "Crystal1 Damaged",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal1-damaged/Crystal1_Damaged.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal1_Damaged.obj"
+    },
+    {
+      "id": "quaternius.prop.key3",
+      "name": "Key3",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-key3/Key3.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Key3.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal2-damaged",
+      "name": "Crystal2 Damaged",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal2-damaged/Crystal2_Damaged.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal2_Damaged.obj"
+    },
+    {
+      "id": "quaternius.prop.potion6-empty",
+      "name": "Potion6 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion6-empty/Potion6_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion6_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.coin",
+      "name": "Coin",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-coin/Coin.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Coin.obj"
+    },
+    {
+      "id": "quaternius.prop.coin-skull",
+      "name": "Coin Skull",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-coin-skull/Coin_Skull.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Coin_Skull.obj"
+    },
+    {
+      "id": "quaternius.prop.dart",
+      "name": "Dart",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-dart/Dart.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Dart.obj"
+    },
+    {
+      "id": "quaternius.prop.chest-open",
+      "name": "Chest Open",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-chest-open/Chest_Open.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Chest_Open.obj"
+    },
+    {
+      "id": "quaternius.prop.necklace3",
+      "name": "Necklace3",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-necklace3/Necklace3.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Necklace3.obj"
+    },
+    {
+      "id": "quaternius.prop.crown2",
+      "name": "Crown2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crown2/Crown2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crown2.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal1",
+      "name": "Crystal1",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal1/Crystal1.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal1.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal2",
+      "name": "Crystal2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal2/Crystal2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal2.obj"
+    },
+    {
+      "id": "quaternius.prop.key1",
+      "name": "Key1",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-key1/Key1.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Key1.obj"
+    },
+    {
+      "id": "quaternius.prop.chest-closed",
+      "name": "Chest Closed",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-chest-closed/Chest_Closed.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Chest_Closed.obj"
+    },
+    {
+      "id": "quaternius.prop.chalice",
+      "name": "Chalice",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-chalice/Chalice.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Chalice.obj"
+    },
+    {
+      "id": "quaternius.prop.book1-open",
+      "name": "Book1 Open",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book1-open/Book1_Open.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book1_Open.obj"
+    },
+    {
+      "id": "quaternius.prop.potion10-empty",
+      "name": "Potion10 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion10-empty/Potion10_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion10_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal3",
+      "name": "Crystal3",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal3/Crystal3.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal3.obj"
+    },
+    {
+      "id": "quaternius.prop.bone",
+      "name": "Bone",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-bone/Bone.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Bone.obj"
+    },
+    {
+      "id": "quaternius.prop.chickenleg",
+      "name": "ChickenLeg",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-chickenleg/ChickenLeg.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/ChickenLeg.obj"
+    },
+    {
+      "id": "quaternius.prop.book4-open",
+      "name": "Book4 Open",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book4-open/Book4_Open.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book4_Open.obj"
+    },
+    {
+      "id": "quaternius.prop.axe-small-golden",
+      "name": "Axe small Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-axe-small-golden/Axe_small_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Axe_small_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.book2-closed",
+      "name": "Book2 Closed",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book2-closed/Book2_Closed.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book2_Closed.obj"
+    },
+    {
+      "id": "quaternius.prop.book3-closed",
+      "name": "Book3 Closed",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book3-closed/Book3_Closed.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book3_Closed.obj"
+    },
+    {
+      "id": "quaternius.prop.book1-closed",
+      "name": "Book1 Closed",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book1-closed/Book1_Closed.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book1_Closed.obj"
+    },
+    {
+      "id": "quaternius.prop.bow-golden",
+      "name": "Bow Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-bow-golden/Bow_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Bow_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.book4-closed",
+      "name": "Book4 Closed",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book4-closed/Book4_Closed.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book4_Closed.obj"
+    },
+    {
+      "id": "quaternius.prop.heart",
+      "name": "Heart",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-heart/Heart.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Heart.obj"
+    },
+    {
+      "id": "quaternius.prop.axe-small",
+      "name": "Axe small",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-axe-small/Axe_small.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Axe_small.obj"
+    },
+    {
+      "id": "quaternius.prop.arrow",
+      "name": "Arrow",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-arrow/Arrow.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Arrow.obj"
+    },
+    {
+      "id": "quaternius.prop.axe-double",
+      "name": "Axe Double",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-axe-double/Axe_Double.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Axe_Double.obj"
+    },
+    {
+      "id": "quaternius.prop.armor-golden",
+      "name": "Armor Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-armor-golden/Armor_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Armor_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.armor-metal2",
+      "name": "Armor Metal2",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-armor-metal2/Armor_Metal2.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Armor_Metal2.obj"
+    },
+    {
+      "id": "quaternius.prop.armor-black",
+      "name": "Armor Black",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-armor-black/Armor_Black.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Armor_Black.obj"
+    },
+    {
+      "id": "quaternius.prop.potion7-empty",
+      "name": "Potion7 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion7-empty/Potion7_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion7_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.crystal3-damaged",
+      "name": "Crystal3 Damaged",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-crystal3-damaged/Crystal3_Damaged.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Crystal3_Damaged.obj"
+    },
+    {
+      "id": "quaternius.prop.armor-metal",
+      "name": "Armor Metal",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-armor-metal/Armor_Metal.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Armor_Metal.obj"
+    },
+    {
+      "id": "quaternius.prop.chest-ingots",
+      "name": "Chest Ingots",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-chest-ingots/Chest_Ingots.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Chest_Ingots.obj"
+    },
+    {
+      "id": "quaternius.prop.arrow-golden",
+      "name": "Arrow Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-arrow-golden/Arrow_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Arrow_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.axe-double-golden",
+      "name": "Axe Double Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-axe-double-golden/Axe_Double_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Axe_Double_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.backpack",
+      "name": "Backpack",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-backpack/Backpack.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Backpack.obj"
+    },
+    {
+      "id": "quaternius.prop.armor-leather",
+      "name": "Armor Leather",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-armor-leather/Armor_Leather.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Armor_Leather.obj"
+    },
+    {
+      "id": "quaternius.prop.book3-open",
+      "name": "Book3 Open",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book3-open/Book3_Open.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book3_Open.obj"
+    },
+    {
+      "id": "quaternius.prop.book2-open",
+      "name": "Book2 Open",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-book2-open/Book2_Open.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Book2_Open.obj"
+    },
+    {
+      "id": "quaternius.prop.potion2-empty",
+      "name": "Potion2 Empty",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion2-empty/Potion2_Empty.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion2_Empty.obj"
+    },
+    {
+      "id": "quaternius.prop.sword-golden",
+      "name": "Sword Golden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-sword-golden/Sword_Golden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Sword_Golden.obj"
+    },
+    {
+      "id": "quaternius.prop.potion1-filled",
+      "name": "Potion1 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion1-filled/Potion1_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion1_Filled.obj"
+    },
+    {
+      "id": "quaternius.prop.bow-wooden",
+      "name": "Bow Wooden",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-bow-wooden/Bow_Wooden.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Bow_Wooden.obj"
+    },
+    {
+      "id": "quaternius.prop.coin-star",
+      "name": "Coin Star",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-coin-star/Coin_Star.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Coin_Star.obj"
+    },
+    {
+      "id": "quaternius.prop.ring5",
+      "name": "Ring5",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-ring5/Ring5.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Ring5.obj"
+    },
+    {
+      "id": "quaternius.prop.bag",
+      "name": "Bag",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-bag/Bag.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Bag.obj"
+    },
+    {
+      "id": "quaternius.prop.potion4-filled",
+      "name": "Potion4 Filled",
+      "category": "prop",
+      "source": "quaternius",
+      "format": "obj",
+      "path": "/quaternius/normalized/prop/quaternius-prop-potion4-filled/Potion4_Filled.obj",
+      "attachmentBone": "hand_r",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Fantasy Props 2.zip:OBJ/Potion4_Filled.obj"
+    },
+    {
+      "id": "quaternius.animation.ual1-standard",
+      "name": "UAL1 Standard",
+      "category": "animation",
+      "source": "quaternius",
+      "format": "fbx",
+      "path": "/quaternius/normalized/animation/quaternius-animation-ual1-standard/UAL1_Standard.fbx",
+      "rig": "quaternius-standard",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "animationSet": "ual1",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Animation Library.zip:Universal Animation Library[Standard]/Unity/UAL1_Standard.fbx"
+    },
+    {
+      "id": "quaternius.animation.ual1-standard-rm",
+      "name": "UAL1 Standard RM",
+      "category": "animation",
+      "source": "quaternius",
+      "format": "fbx",
+      "path": "/quaternius/normalized/animation/quaternius-animation-ual1-standard-rm/UAL1_Standard_RM.fbx",
+      "rig": "quaternius-standard",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "animationSet": "ual1",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Animation Library.zip:Universal Animation Library[Standard]/Unity/UAL1_Standard_RM.fbx"
+    },
+    {
+      "id": "quaternius.animation.ual2-standard",
+      "name": "UAL2 Standard",
+      "category": "animation",
+      "source": "quaternius",
+      "format": "fbx",
+      "path": "/quaternius/normalized/animation/quaternius-animation-ual2-standard/UAL2_Standard.fbx",
+      "rig": "quaternius-standard",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "animationSet": "ual2",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Animation Library 2.zip:Universal Animation Library 2[Standard]/Unity/UAL2_Standard.fbx"
+    },
+    {
+      "id": "quaternius.animation.ual2-standard-rm",
+      "name": "UAL2 Standard RM",
+      "category": "animation",
+      "source": "quaternius",
+      "format": "fbx",
+      "path": "/quaternius/normalized/animation/quaternius-animation-ual2-standard-rm/UAL2_Standard_RM.fbx",
+      "rig": "quaternius-standard",
+      "compatibleRigs": [
+        "quaternius-standard"
+      ],
+      "animationSet": "ual2",
+      "runtimeStatus": "normalized-source",
+      "sourcePath": "Animation Library 2.zip:Universal Animation Library 2[Standard]/Unity/UAL2_Standard_RM.fbx"
+    }
+  ],
+  "generatedFrom": "catalog.json"
+}

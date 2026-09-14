@@ -4,6 +4,8 @@ import path from 'node:path'
 import * as THREE from 'three'
 import { ManifestDataManager } from '../../src/library/manifestDataManager'
 import { CharacterManager } from '../../src/library/characterManager'
+import { KTXTools } from '../../src/library/ktxtools'
+import { resolveAssetImportPath } from '../../src/App'
 
 describe('Quaternius and human-male manifest integration', () => {
   it('should expose only the plain adult-human character and no extra clothing entries in the app manifest', async () => {
@@ -34,6 +36,14 @@ describe('Quaternius and human-male manifest integration', () => {
     expect(quaterniusManifest.initialTraits).toEqual(['Body'])
     expect(quaterniusManifest.displayScale).toBeLessThan(1)
     expect(bodyTrait.cameraTarget).toMatchObject({ distance: 2.3, height: 0.8 })
+  })
+
+  it('should fall back to the bundled public manifest when the env asset path is unset', () => {
+    expect(resolveAssetImportPath()).toBe('./manifest.json')
+    expect(resolveAssetImportPath('')).toBe('./manifest.json')
+    expect(resolveAssetImportPath('undefined')).toBe('./manifest.json')
+    expect(resolveAssetImportPath('./loot-assets')).toBe('./loot-assets/manifest.json')
+    expect(resolveAssetImportPath('https://example.com/assets/')).toBe('https://example.com/assets/manifest.json')
   })
 
   it('should switch the active manifest to the body-only adult-human manifest without clothing groups', async () => {
@@ -112,6 +122,18 @@ describe('Quaternius and human-male manifest integration', () => {
     expect(() => manager.setCharacterVerticalOffset(0.25)).not.toThrow()
     expect(manager.getCharacterVerticalOffset()).toBe(0.25)
     expect(manager.characterModel.position.y).toBe(0.25)
+  })
+
+  it('should fail gracefully when the KTX library is unavailable in non-browser contexts', async () => {
+    const originalLibKtx = global.LIBKTX
+    delete global.LIBKTX
+
+    try {
+      const tools = new KTXTools()
+      await expect(tools.compress(new Uint8Array([0, 0, 0, 255]), 1, 1, 4)).rejects.toThrow(/KTX library unavailable|KTX.*unavailable/i)
+    } finally {
+      global.LIBKTX = originalLibKtx
+    }
   })
 
   it('should not crash when a loaded VRM has no spring bone manager', async () => {

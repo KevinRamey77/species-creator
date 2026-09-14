@@ -30,7 +30,7 @@
   bottom: 290px;
   cursor: pointer;
   background: rgba(5, 11, 14, 1);
-  background-image: url('./ui/refresh.png');
+  background-image: url('/ui/refresh.png');
   background-size: cover;
   background-repeat: no-repeat;
   z-index: 12;
@@ -140,10 +140,27 @@
 
 .classdisabled {
   opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
 }
 
 .classdisabled:hover {
   opacity: 0.75;
+}
+
+.statusMessage {
+  width: 100%;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 24px;
+  color: rgba(218, 228, 255, 0.78);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+  white-space: normal;
 }
 
 .refreshDisabled {

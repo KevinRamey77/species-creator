@@ -1,3 +1,45 @@
 .button {
   margin: 0 8px;
 }
+
+.nameField {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 8px;
+  color: rgba(237, 243, 255, 0.78);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nameField input {
+  width: 128px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 9px;
+  border: 1px solid rgba(180, 202, 235, 0.3);
+  border-radius: 7px;
+  outline: none;
+  background: rgba(5, 11, 14, 0.72);
+  color: #f4f7ff;
+  font: inherit;
+  text-transform: none;
+}
+
+.nameField input:focus {
+  border-color: rgba(141, 232, 180, 0.8);
+  box-shadow: 0 0 0 2px rgba(141, 232, 180, 0.14);
+}
+
+@media (max-width: 760px) {
+  .nameField {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+  }
+
+  .nameField input {
+    width: 108px;
+  }
+}

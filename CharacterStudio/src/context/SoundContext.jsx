@@ -1,13 +1,23 @@
 import React, { createContext, useEffect, useState } from "react"
 import * as THREE from "three"
 import useSound from "use-sound"
-import soundFileSpecs from '../../public/sound/sound-files.json';
-import soundUrl from '../../public/sound/sounds.mp3';
+
+const soundFileSpecsUrl = "/sound/sound-files.json"
+const soundUrl = "/sound/sounds.mp3"
 
 export const SoundContext = createContext()
 
 export const SoundProvider = (props) => {
-  const _getSoundFiles = regex => soundFileSpecs.find(f => regex.test(f.name));
+  const [soundFileSpecs, setSoundFileSpecs] = useState([])
+
+  useEffect(() => {
+    fetch(soundFileSpecsUrl)
+      .then(response => response.json())
+      .then(setSoundFileSpecs)
+      .catch(error => console.error("Unable to load sound manifest:", error))
+  }, [])
+
+  const _getSoundFiles = regex => soundFileSpecs.find(f => regex.test(f.name)) || { offset: 0, duration: 0 };
 
   const [play] = useSound(soundUrl, {
     sprite: {

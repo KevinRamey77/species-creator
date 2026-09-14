@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from "@web3-react/injected-connector"
 import { ViewContext, ViewMode } from '../context/ViewContext';
+import { SceneContext } from '../context/SceneContext';
 
 import { SoundContext } from "../context/SoundContext"
 import { AudioContext } from "../context/AudioContext"
@@ -11,7 +12,10 @@ import { AudioContext } from "../context/AudioContext"
 function Load() {
     const { account, library, activate } = useWeb3React();
     const [characters, setCharacters] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
     const { setViewMode } = React.useContext(ViewContext);
+    const { characterManager } = React.useContext(SceneContext);
     const { playSound } = React.useContext(SoundContext)
     const { isMute } = React.useContext(AudioContext)
 
@@ -21,6 +25,7 @@ function Load() {
     
     useEffect(() => {
         if (account && library) {
+            const loadWalletCharacters = async () => {
             const contractAddress = '0x69341F01C2113E2d09Cd4837bbF1786dfbBc41d7';
             const abi = [
                 'function balanceOf(address owner) external view returns (uint256)',
@@ -28,20 +33,21 @@ function Load() {
                 'function tokenURI(uint256 tokenId) external view returns (string)',
             ];
             const contract = new ethers.Contract(contractAddress, abi, library);
-            contract.balanceOf(account).then((balance) => {
-                const promises = [];
-                for (let i = 0; i < balance; i++) {
-                    promises.push(contract.tokenOfOwnerByIndex(account, i));
+                try {
+                    const balance = await contract.balanceOf(account);
+                    const tokenIds = await Promise.all(
+                        Array.from({ length: Number(balance) }, (_, index) =>
+                            contract.tokenOfOwnerByIndex(account, index)
+                        )
+                    );
+                    const values = await Promise.all(tokenIds.map((tokenId) => contract.tokenURI(tokenId)));
+                    setCharacters(values);
+                } catch {
+                    setError("Unable to load characters from this wallet.");
                 }
-                Promise.all(promises).then((tokenIds) => {
-                    const tokenURIs = tokenIds.map((tokenId) => {
-                        return contract.tokenURI(tokenId);
-                    });
-                    Promise.all(tokenURIs).then((values) => {
-                        setCharacters(values);
-                    });
-                });
-            });
+            };
+
+            loadWalletCharacters();
         }
     }, [account, library]);
 
@@ -49,9 +55,23 @@ function Load() {
         activate(injectedConnector)
     }
 
-    const loadCharacter = (character) => {
-        !isMute && playSound('backNextButton');
-        setViewMode(ViewMode.APPEARANCE)
+    const loadCharacter = async (character) => {
+        setError("");
+        setIsLoading(true);
+        try {
+            const response = await fetch(character);
+            if (!response.ok) {
+                throw new Error(`Metadata request failed with status ${response.status}`);
+            }
+            const metadata = await response.json();
+            await characterManager.loadTraitsFromNFTObject(metadata);
+            setViewMode(ViewMode.APPEARANCE);
+            !isMute && playSound('backNextButton');
+        } catch (loadError) {
+            setError(loadError.message || "Unable to load this character.");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     const back = () => {
@@ -64,21 +84,35 @@ function Load() {
         {/* if the user has not logged in, display a message */}
             {!account && (
                 <div className={styles.message}>
-                    Please connect your wallet to load your characters
+                    <p>Please connect your wallet to load your characters.</p>
                     {/* show connect button */}
                     <button className={styles.button} onClick={() => connectWallet()}>Connect</button>
                 </div>
             )}
             <div className={styles.characterContainer}>
                 <div className={styles.title}>Load Character</div>
+                {isLoading && <div className={styles.message}>Loading character metadata...</div>}
+                {error && <div className={styles.error}>{error}</div>}
+                {!isLoading && account && characters.length === 0 && !error && (
+                    <div className={styles.message}>No characters were found in this wallet.</div>
+                )}
                 {characters.map((character, i) => {
                     return (
                         <div
                             key={i}
                                 className={styles.character}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`Load character ${i + 1}`}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter" || event.key === " ") {
+                                            event.preventDefault();
+                                            loadCharacter(character);
+                                        }
+                                    }}
                                     onClick={()=> {loadCharacter(character)}}
                                     >
-                            {JSON.stringify(character)}
+                            Character {i + 1}
                         </div>
                     );
                 })}

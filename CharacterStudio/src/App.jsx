@@ -94,7 +94,14 @@ const fetchData = () => {
   }
 }
 
-const resource = fetchData()
+const resource = typeof window === "undefined" || import.meta.env.MODE === "test"
+  ? {
+      read: () => ({
+        initialManifest: [],
+        effectManager: new EffectManager(),
+      }),
+    }
+  : fetchData()
 
 export default function App() {
   const {

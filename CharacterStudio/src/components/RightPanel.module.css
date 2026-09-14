@@ -3,28 +3,31 @@
   position: fixed;
   right: 32px;
   top: 98px;
-  width:90px;
+  width:74px;
   height: auto;
   backdrop-filter: blur(22.5px);
-  background: rgba(5, 11, 14, 0.8);
+  padding: 14px 8px;
+  box-sizing: border-box;
+  border: 1px solid rgba(180, 202, 235, 0.18);
+  border-radius: 16px;
+  background: rgba(6, 11, 17, 0.9);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
   z-index: 1000;
   user-select: none;
 }
 
 
 .scrollContainer {
-  height: 100%;
-  width: 80%;
-  overflow-y: scroll;
+  height: 350px;
+  width: 100%;
+  overflow-y: auto;
   position: relative;
   overflow-x: hidden !important;
-  margin: 16px;
-  height: 350px;
+  margin: 0;
 }
 .options-container {
   user-select: none;
-  flex: 1;
-  width: 200px;
+  width: 100%;
   position: relative;
   text-align: center;
 }

@@ -14,8 +14,14 @@ export const ExportMenu = ({currentPrice, onPurchaseClick}) => {
 
   // Translate hook
   const { t } = useContext(LanguageContext);
-  const [name] = React.useState(localStorage.getItem("name") || defaultName)
-  const { model, characterManager } = useContext(SceneContext)
+  const [name, setName] = React.useState(localStorage.getItem("name") || defaultName)
+  const { characterManager } = useContext(SceneContext)
+
+  const handleNameChange = (event) => {
+    const nextName = event.target.value.replace(/[\\/:*?"<>|]/g, "").slice(0, 48)
+    setName(nextName)
+    localStorage.setItem("name", nextName)
+  }
 
 
   const getOptions = () =>{
@@ -39,7 +45,8 @@ export const ExportMenu = ({currentPrice, onPurchaseClick}) => {
     /**
      * Blindly assume the whole avatar is VRM0 if the first vrm is VRM0
      */
-    options.isVrm0 = Object.values(characterManager.avatar)[0].vrm.meta.metaVersion=='0'
+    const firstAvatar = Object.values(characterManager.avatar || {})[0]
+    options.isVrm0 = firstAvatar?.vrm?.meta?.metaVersion === "0"
     options.outputVRM0 = !(version === 1)
     characterManager.downloadVRM(name, options);
   }
@@ -55,6 +62,16 @@ export const ExportMenu = ({currentPrice, onPurchaseClick}) => {
 
   return (
     <React.Fragment>
+      <label className={styles.nameField}>
+        <span>Character name</span>
+        <input
+          type="text"
+          value={name}
+          onChange={handleNameChange}
+          aria-label="Character name"
+          placeholder={defaultName}
+        />
+      </label>
       {currentPrice === 0 ? (
         <>
           <CustomButton
@@ -66,6 +83,14 @@ export const ExportMenu = ({currentPrice, onPurchaseClick}) => {
             onClick={() => {
               downloadGLB();
             }}
+          />
+          <CustomButton
+            theme="light"
+            text="VRM 1"
+            icon="download"
+            size={14}
+            className={styles.button}
+            onClick={() => downloadVRM(1)}
           />
           <CustomButton
             theme="light"

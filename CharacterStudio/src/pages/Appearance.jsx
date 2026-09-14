@@ -266,6 +266,13 @@ function Appearance() {
     }
   }
 
+  const activateOnEnter = (event, action) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      action()
+    }
+  }
+
 
   const uploadTrait = () =>{
     setIsPickingColor(false);
@@ -307,7 +314,12 @@ function Appearance() {
             {
               characterManager.getGroupTraits().map((traitGroup, index) => (
                 <div key={"options_" + index} 
-                className={styles["editorButton"]}
+                className={`${styles["editorButton"]} ${selectedTraitGroup?.trait === traitGroup.trait ? styles["editorButtonActive"] : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selectedTraitGroup?.trait === traitGroup.trait}
+                aria-label={`Select ${traitGroup.name}`}
+                onKeyDown={(event) => activateOnEnter(event, () => selectTraitGroup(traitGroup))}
                 onClick={() => {
                   selectTraitGroup(traitGroup)
                 }}>
@@ -329,7 +341,7 @@ function Appearance() {
       !!traits && selectedTraitGroup && (
         <div className={styles["selectorContainerPos"]}>
         
-          <MenuTitle title={selectedTraitGroup.trait} width={130} left={20}/>
+          <MenuTitle title={selectedTraitGroup.name || selectedTraitGroup.trait} width={180} left={20}/>
           <div
               className={styles["selectorPickerTabs"]}
               >
@@ -366,6 +378,10 @@ function Appearance() {
                 <div
                   key={"randomize-trait"}
                   className={`${styles["selectorButton"]}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Randomize ${selectedTraitGroup.name || selectedTraitGroup.trait}`}
+                  onKeyDown={(event) => activateOnEnter(event, () => randomTrait(selectedTraitGroup.trait))}
                   onClick={() => {randomTrait(selectedTraitGroup.trait)}}
                 >
                   <TokenBox
@@ -380,7 +396,10 @@ function Appearance() {
                   <div
                     key={"no-trait"}
                     className={`${styles["selectorButton"]}`}
-                    icon={cancel}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Remove ${selectedTraitGroup.name || selectedTraitGroup.trait}`}
+                    onKeyDown={(event) => activateOnEnter(event, () => removeTrait(selectedTraitGroup.trait))}
                     onClick={() => {removeTrait(selectedTraitGroup.trait)}}
                   >
                     <TokenBox
@@ -399,7 +418,12 @@ function Appearance() {
                 return (
                   <div
                     key={index}
-                    className={`${styles["selectorButton"]}`}
+                    className={`${styles["selectorButton"]} ${active ? styles["selectorButtonActive"] : ""}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={active}
+                    aria-label={`Select ${trait.name || trait.id}`}
+                    onKeyDown={(event) => activateOnEnter(event, () => selectTrait(trait))}
                     onClick={()=>{selectTrait(trait); console.log(trait)}}
                   >
                     <TokenBox

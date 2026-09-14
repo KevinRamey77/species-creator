@@ -4,13 +4,17 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 500px;
+  width: min(600px, calc(100vw - 32px));
+  height: min(500px, calc(100vh - 120px));
+  z-index: 1200;
+  border: 1px solid rgba(180, 202, 235, 0.2);
+  border-radius: 18px;
   text-align: center;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(22.5px);
-  background: rgba(5, 11, 14, 0.8);
+  background: linear-gradient(180deg, rgba(10, 17, 26, 0.97), rgba(6, 11, 17, 0.96));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
   user-select: none;
 }
 .traitText{

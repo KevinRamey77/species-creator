@@ -45,6 +45,7 @@ function Create() {
           manifest: c.manifest,
           icon:c.icon,
           format:c.format,
+          disabled: c.disabled,
           manifestAppend: getCharacterManifests(getAsArray(c.manifestAppend)),
         }
       })
@@ -53,6 +54,11 @@ function Create() {
   const selectClass = async (index) => {
     setIsLoading(true)
     const selectedClass = classes[index];
+
+    if (!selectedClass || selectedClass.disabled) {
+      setIsLoading(false)
+      return
+    }
 
     await characterManager.loadManifest(selectedClass.manifest,selectedClass.name);
 
@@ -79,6 +85,13 @@ function Create() {
   const hoverSound = () => {
     !isMute && playSound('classMouseOver');
   }
+
+  const activateOnEnter = (event, action) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      action()
+    }
+  }
   
   return (
     <div className={`${styles.container} horizontalScroll`}>
@@ -90,6 +103,14 @@ function Create() {
       <div className={styles.topLine} />
       
       <div className={styles.classContainer}>
+        {isLoading && classes.length === 0 && (
+          <div className={styles.statusMessage}>Loading character classes...</div>
+        )}
+        {!isLoading && classes.length === 0 && (
+          <div className={styles.statusMessage}>
+            No character classes are available. Check the active manifest and asset path.
+          </div>
+        )}
         {classes.map((characterClass, i) => {
           return (
             <div
@@ -99,9 +120,12 @@ function Create() {
                   ? styles.class
                   : styles.classdisabled
               }
-              onClick={
-                  () => selectClass(i)
-              }
+                role="button"
+                tabIndex={characterClass.disabled ? -1 : 0}
+                aria-disabled={characterClass.disabled}
+                aria-label={`Select ${characterClass.name}`}
+                onKeyDown={(event) => activateOnEnter(event, () => selectClass(i))}
+                onClick={() => selectClass(i)}
               onMouseOver={
                   () => hoverSound()
               }
@@ -115,6 +139,7 @@ function Create() {
                 <div className={styles.frameContainer}>
                   <img
                     src={"./assets/backgrounds/class-frame.svg"}
+                    alt=""
                     className={styles.frame}
                   />
                 </div>

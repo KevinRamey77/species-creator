@@ -42,32 +42,50 @@ function Landing() {
     !isMute && playSound('backNextButton');
   }
 
+  const actions = [
+    {
+      label: "Create character",
+      description: "Choose a base and customize traits",
+      image: "./assets/media/btn_create_character.png",
+      action: createCharacter,
+    },
+    {
+      label: "Batch character",
+      description: "Generate characters from metadata",
+      image: "./assets/media/btn_batch_download_character.png",
+      action: createVRMCharacter,
+    },
+    {
+      label: "Optimize character",
+      description: "Prepare an existing avatar for export",
+      image: "./assets/media/btn_optimize_character.png",
+      action: optimizeCharacter,
+    },
+    {
+      label: "Load character",
+      description: "Load an owned character from your wallet",
+      image: "./assets/media/btn_load_character.png",
+      action: loadCharacter,
+    },
+  ]
+
   return (
     <div className={styles.container}>
+      <div className={styles.intro}>
+        <div className={styles.eyebrow}>Character Studio</div>
+        <h1>Build your next avatar</h1>
+        <p>Choose a workflow to start creating, processing, or exporting a character.</p>
+      </div>
       <div className={styles.buttonContainer}>
-        <button className={styles.button} onClick={createCharacter}>
-          <img src="./assets/media/btn_create_character.png" />
-        </button>
-        <button className={styles.button} onClick={createVRMCharacter}>
-          <img src="./assets/media/btn_batch_download_character.png" />
-        </button>
-        <button className={styles.button} onClick={optimizeCharacter}>
-          <img src="./assets/media/btn_optimize_character.png" />
-        </button>
-        {
-        // opensea_Key && opensea_Key != "" && <button className={styles.button} onClick={getWallet}>
-        //   <img src="./assets/media/btn_optimize_character.png" />
-        // </button>
-        }
-        {/* <button className={styles.button} onClick={createCharacter}>
-          <img src="./assets/media/btn_tools.png" />
-        </button> */}
-        {/*
-        <button className={styles.button}
-            onClick={
-                loadCharacter
-            }><img src='/assets/media/btn_load_character.png' /></button>
-            */}
+        {actions.map((item) => (
+          <button className={styles.button} onClick={item.action} key={item.label}>
+            <img src={item.image} alt="" />
+            <span className={styles.buttonContent}>
+              <strong>{item.label}</strong>
+              <small>{item.description}</small>
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   )

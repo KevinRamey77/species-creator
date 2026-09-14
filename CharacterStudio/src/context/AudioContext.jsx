@@ -1,6 +1,7 @@
 import React, {useState, createContext} from 'react';
 export const AudioContext = createContext();
-import bgm from "../../public/sound/background/cc_bgm_balanced.wav"
+
+const bgm = "/sound/background/cc_bgm_balanced.wav"
 
 export const AudioProvider = ({ children }) => {
     const [isMute, setMute] = useState(false);

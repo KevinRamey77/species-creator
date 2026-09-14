@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "npm --prefix CharacterStudio run dev -- --host 0.0.0.0",
+    "build": "npm --prefix CharacterStudio run build",
+    "start": "npm --prefix CharacterStudio run serve",
+    "dev:next": "next dev",
+    "build:next": "next build",
     "lint": "eslint"
   },
   "dependencies": {

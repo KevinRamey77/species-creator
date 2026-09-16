@@ -8,15 +8,17 @@ import { KTXTools } from '../../src/library/ktxtools'
 import { resolveAssetImportPath } from '../../src/App'
 
 describe('Quaternius and human-male manifest integration', () => {
-  it('should expose only the plain adult-human character and no extra clothing entries in the app manifest', async () => {
+  it('should expose the legacy VRM and Quaternius character choices', async () => {
     const workspaceRoot = path.resolve(__dirname, '../..')
     const mainManifestPath = path.join(workspaceRoot, 'public/manifest.json')
     const subManifestPath = path.join(workspaceRoot, 'public/quaternius/manifest.json')
 
     const mainManifest = JSON.parse(await readFile(mainManifestPath, 'utf-8'))
-    expect(mainManifest.characters).toHaveLength(1)
-    expect(mainManifest.characters[0].name).toBe('Adult Human')
-    expect(mainManifest.characters[0].manifest).toContain('quaternius/manifest.json')
+    expect(mainManifest.characters).toHaveLength(2)
+    expect(mainManifest.characters[0].name).toBe('Quaternius Characters')
+    expect(mainManifest.characters[0].manifest).toContain('quaternius/editor-manifest.json')
+    expect(mainManifest.characters[1].name).toBe('Adult Human')
+    expect(mainManifest.characters[1].manifest).toContain('quaternius/manifest.json')
     expect(mainManifest.loras).toEqual([])
     expect(mainManifest.sprites).toEqual([])
     expect(mainManifest.thumbnails).toEqual([])
@@ -145,5 +147,41 @@ describe('Quaternius and human-male manifest integration', () => {
     }
 
     expect(() => manager._applySpringBoneColliders(vrm)).not.toThrow()
+  })
+
+  it('should attach a generic Quaternius model without using VRM setup', () => {
+    const scene = { position: { set: vi.fn() } }
+    const model = { scene, userData: {} }
+    const manager = Object.create(CharacterManager.prototype)
+    manager.avatar = {}
+    manager.characterModel = {
+      attach: vi.fn(),
+      remove: vi.fn(),
+    }
+    manager.manifestDataManager = {
+      mainManifestData: { offset: [0, 0, 0] },
+      getDisplayScale: () => 1,
+    }
+    manager._modelBaseSetup = vi.fn()
+    manager._VRMBaseSetup = vi.fn(() => {
+      throw new Error('generic models must not use VRM setup')
+    })
+    manager._positionModel = vi.fn()
+    manager._displayModel = vi.fn()
+
+    manager._addLoadedData({
+      collectionID: 'quaternius',
+      traitGroupID: 'Body',
+      traitModel: { format: 'gltf', name: 'Superhero Male' },
+      models: [model],
+      textures: [],
+      colors: [],
+    })
+
+    expect(manager._modelBaseSetup).toHaveBeenCalled()
+    expect(manager._VRMBaseSetup).not.toHaveBeenCalled()
+    expect(manager._displayModel).toHaveBeenCalledWith(model)
+    expect(manager.avatar.Body.model).toBe(scene)
+    expect(manager.avatar.Body.vrm).toBeNull()
   })
 })

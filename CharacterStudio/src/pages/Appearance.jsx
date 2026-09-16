@@ -8,7 +8,6 @@ import { SoundContext } from "../context/SoundContext"
 import { AudioContext } from "../context/AudioContext"
 import FileDropComponent from "../components/FileDropComponent"
 import { getFileNameWithoutExtension } from "../library/utils"
-import MenuTitle from "../components/MenuTitle"
 import BottomDisplayMenu from "../components/BottomDisplayMenu"
 import decalPicker from "../images/sticker.png"
 import { TokenBox } from "../components/token-box/TokenBox"
@@ -20,7 +19,7 @@ import colorPicker from "../images/color-palette.png"
 import { ChromePicker   } from 'react-color'
 import RightPanel from "../components/RightPanel"
 import SaleIcon from "../images/sale-icon.png"
-import CatalogAssetPanel from "../components/CatalogAssetPanel"
+import MenuTitle from "../components/MenuTitle"
 
   /**
    * @typedef {import("../library/CharacterManifestData.js").TraitModelsGroup} TraitModelsGroup
@@ -33,7 +32,7 @@ export const TraitPage ={
   DECAL:2
 }
 
-function Appearance() {
+function LegacyAppearance() {
   const { isLoading, setViewMode, setIsLoading } = React.useContext(ViewContext)
   const {
     toggleDebugMode,
@@ -297,7 +296,6 @@ function Appearance() {
 
   return (
     <div className={styles.container}>
-      <CatalogAssetPanel />
       <div className={`loadingIndicator ${isLoading ? "active" : ""}`}>
         <img className={"rotate"} src="ui/loading.svg" />
       </div>
@@ -500,8 +498,6 @@ function Appearance() {
   )
 }
 
-export default Appearance
-
 /**
  * @param {{selectedTrait:ModelTrait|null,selectedBlendShapeTrait:Record<string,string>,onBack:()=>void,setSelectedBlendshapeTrait:(x:Record<string,string>)=>void}} param0 
  */
@@ -587,3 +583,121 @@ const BlendShapeItem = ({active,blendshapeID,src,select})=>{
     </div>
   )
 }
+
+function Appearance() {
+  const { setViewMode } = React.useContext(ViewContext)
+  const {
+    assetCatalog,
+    assetCatalogLoading,
+    assetCatalogError,
+    selectedRuntimeBody,
+    selectedRuntimeAssets,
+    runtimeBodyLoading,
+    runtimeBodyError,
+    clearRuntimeBody,
+    selectRuntimeAsset,
+  } = React.useContext(SceneContext)
+  const { t } = useContext(LanguageContext)
+  const [assetCategory, setAssetCategory] = React.useState("hair")
+  const assetCategories = [
+    { id: "hair", label: "Hair" },
+    { id: "clothing", label: "Clothing" },
+  ]
+
+  const back = () => {
+    clearRuntimeBody()
+    setViewMode(ViewMode.CREATE)
+  }
+
+  const bodyName = selectedRuntimeBody?.id.endsWith("female") ? "Female" : "Male"
+  const compatibleAssets = selectedRuntimeBody && assetCatalog
+    ? assetCatalog.getCompatible(assetCategory, {
+        bodyId: selectedRuntimeBody.id,
+        rig: "quaternius-standard",
+      })
+    : []
+
+  const selectAsset = async (asset) => {
+    try {
+      await selectRuntimeAsset(asset)
+    } catch (error) {
+      console.error("Unable to load Quaternius appearance asset:", error)
+    }
+  }
+
+  return (
+    <main className={styles.focusedContainer}>
+      <div className="sectionTitle">{t("pageTitles.chooseAppearance")}</div>
+      <section className={styles.previewStatus} aria-live="polite">
+        <div className={styles.previewEyebrow}>Quaternius Human</div>
+        {assetCatalogLoading && <h1>Loading bodies...</h1>}
+        {!assetCatalogLoading && assetCatalogError && (
+          <h1>Asset catalog unavailable</h1>
+        )}
+        {!assetCatalogLoading && !assetCatalogError && runtimeBodyLoading && (
+          <h1>Rendering {bodyName}...</h1>
+        )}
+        {!assetCatalogLoading && !assetCatalogError && !runtimeBodyLoading && !selectedRuntimeBody && (
+          <h1>Select a body to begin</h1>
+        )}
+        {!runtimeBodyLoading && selectedRuntimeBody && !runtimeBodyError && <h1>{bodyName} Human</h1>}
+        {runtimeBodyError && <p className={styles.errorMessage}>{runtimeBodyError}</p>}
+      </section>
+      {!assetCatalogLoading && !assetCatalogError && selectedRuntimeBody && !runtimeBodyError && (
+        <>
+          <aside className={styles.sideMenu} aria-label="Appearance categories">
+            <MenuTitle title="Appearance" left={20} />
+            <div className={styles.bottomLine} />
+            <div className={styles.scrollContainer}>
+              <div className={styles["editor-container"]}>
+                {assetCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    className={`${styles.editorButton} ${assetCategory === category.id ? styles.editorButtonActive : ""}`}
+                    onClick={() => setAssetCategory(category.id)}
+                  >
+                    <span className={styles.editorText}>{category.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+          <section className={styles.selectorContainerPos} aria-label={`${assetCategory} options`}>
+            <MenuTitle title={assetCategories.find((category) => category.id === assetCategory)?.label} width={180} left={20} />
+            <div className={styles.bottomLine} />
+            <div className={styles.scrollContainerOptions}>
+              <div className={styles.runtimeAssetGrid}>
+                {compatibleAssets.map((asset) => {
+                  const slot = asset.slot || asset.category
+                  const active = selectedRuntimeAssets?.[slot] === asset.id
+                  return (
+                    <button
+                      key={asset.id}
+                      type="button"
+                      className={`${styles.runtimeAssetButton} ${active ? styles.runtimeAssetButtonActive : ""}`}
+                      onClick={() => selectAsset(asset)}
+                    >
+                      {asset.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+      <div className={styles.focusedHint}>Choose a category, then select a compatible asset.</div>
+      <div className={styles.focusedButtonContainer}>
+        <CustomButton
+          theme="light"
+          text={t("callToAction.back")}
+          size={14}
+          onClick={back}
+        />
+      </div>
+    </main>
+  )
+}
+
+export default Appearance

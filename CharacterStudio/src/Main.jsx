@@ -16,6 +16,31 @@ import "./lib/localization/i18n"
 import App from "./App"
 import { LanguageProvider } from "./context/LanguageContext"
 
+class AppErrorBoundary extends React.Component {
+  state = { error: null }
+
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Character Studio startup error:", error, errorInfo)
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <main style={{ padding: "2rem", color: "white", fontFamily: "sans-serif" }}>
+          <h1>Character Studio could not start</h1>
+          <pre>{this.state.error.stack || this.state.error.message}</pre>
+        </main>
+      )
+    }
+
+    return this.props.children
+  }
+}
+
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider)
   library.pollingInterval = 12000
@@ -30,9 +55,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <ViewProvider>
             <SceneProvider>
               <SoundProvider>
-                <Suspense>
-                  <App />
-                </Suspense>
+                <AppErrorBoundary>
+                  <Suspense fallback={<main style={{ padding: "2rem", color: "white", fontFamily: "sans-serif" }}>Loading Character Studio...</main>}>
+                    <App />
+                  </Suspense>
+                </AppErrorBoundary>
               </SoundProvider>
             </SceneProvider>
           </ViewProvider>

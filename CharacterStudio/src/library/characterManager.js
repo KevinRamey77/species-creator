@@ -985,6 +985,9 @@ export class CharacterManager {
     loadManifest(url, identifier){
       return this.manifestDataManager.loadManifest(url, identifier);
     }
+    getLoadedManifestByIdentifier(identifier){
+      return this.manifestDataManager.getLoadedManifestByIdentifier(identifier);
+    }
     /**
      * Gets the current optimizer character model.
      * @returns {Object} Current optimizer character model
@@ -1695,6 +1698,17 @@ export class CharacterManager {
       disposeVRM(vrm)
     }
 
+    _disposeGenericModel(model){
+      model?.scene?.traverse?.((child) => {
+        child.geometry?.dispose?.()
+        const materials = Array.isArray(child.material) ? child.material : [child.material]
+        materials.filter(Boolean).forEach((material) => {
+          material.map?.dispose?.()
+          material.dispose?.()
+        })
+      })
+    }
+
 
     /**
      * Adds loaded data to the character.
@@ -1715,9 +1729,13 @@ export class CharacterManager {
 
       // user selected to remove trait
       if (traitModel == null){
-          if ( this.avatar[traitGroupID] && this.avatar[traitGroupID].vrm ){
-              // just dispose for now
-              this._disposeTrait(this.avatar[traitGroupID].vrm)
+          if (this.avatar[traitGroupID]){
+              if (this.avatar[traitGroupID].vrm) {
+                this._disposeTrait(this.avatar[traitGroupID].vrm)
+              } else {
+                this._disposeGenericModel(this.avatar[traitGroupID].modelData)
+              }
+              this.characterModel.remove(this.avatar[traitGroupID].model)
               
               delete this.avatar[traitGroupID]
               // XXX restore effects without setTimeout
@@ -1725,35 +1743,47 @@ export class CharacterManager {
           return;
       }
 
+      let loadedModel = null;
       let vrm = null;
 
       models.map((m)=>{
-          if (m != null)
+          if (m == null) return;
+          if (traitModel.format === 'vrm') {
             vrm = this._VRMBaseSetup(m, collectionID, traitModel, traitGroupID, textures, colors);
+            loadedModel = vrm;
+          } else {
+            this._modelBaseSetup(m, collectionID, traitModel, traitGroupID, textures, colors);
+            loadedModel = m;
+          }
 
       })
 
       // do nothing, an error happened
-      if (vrm == null)
+      if (loadedModel == null)
         return;
 
       // If there was a previous loaded model, remove it (maybe also remove loaded textures?)
-      if (this.avatar[traitGroupID] && this.avatar[traitGroupID].vrm) {
-        this._disposeTrait(this.avatar[traitGroupID].vrm)
+      if (this.avatar[traitGroupID]) {
+        if (this.avatar[traitGroupID].vrm) {
+          this._disposeTrait(this.avatar[traitGroupID].vrm)
+        } else {
+          this._disposeGenericModel(this.avatar[traitGroupID].modelData)
+        }
+        this.characterModel.remove(this.avatar[traitGroupID].model)
         // XXX restore effects
       }
 
-      this._positionModel(vrm)
+      this._positionModel(loadedModel)
       const defaultOffset = Array.isArray(this.manifestDataManager?.mainManifestData?.offset)
         ? this.manifestDataManager.mainManifestData.offset
         : DEFAULT_CHARACTER_OFFSET
-      vrm.scene.position.set(defaultOffset[0] ?? 0, defaultOffset[1] ?? 0, defaultOffset[2] ?? 0)
+      loadedModel.scene.position.set(defaultOffset[0] ?? 0, defaultOffset[1] ?? 0, defaultOffset[2] ?? 0)
 
-      this._displayModel(vrm)
+      this._displayModel(loadedModel)
         
-      this._applyManagers(vrm)
+      if (vrm) this._applyManagers(vrm)
 
-      if(this.overlayedTextureManager){
+      if(vrm && this.overlayedTextureManager){
         if(traitModel.targetDecalCollection){
           this.overlayedTextureManager.setTargetVRM(vrm, traitModel.decalMeshNameTargets)
         }
@@ -1767,8 +1797,9 @@ export class CharacterManager {
         textureInfo: textureTrait,
         colorInfo: colorTrait,
         name: traitModel.name,
-        model: vrm && vrm.scene,
-        vrm: vrm
+        model: loadedModel.scene,
+        modelData: loadedModel,
+        vrm
       }
     }
 }
@@ -1820,10 +1851,12 @@ class TraitLoadingManager{
                 const loadedModels = await Promise.all(
                     getAsArray(option?.traitModel?.fullDirectory).map(async (modelDir) => {
                         try {
-                            return await this.gltfLoader.loadAsync(modelDir)
+                        const resolvedModelURL = new URL(modelDir, document.baseURI).href
+                        const loadedModel = await this.gltfLoader.loadAsync(resolvedModelURL)
+                        loadedModel.userData.modelFormat = option?.traitModel?.format || 'vrm'
+                        return loadedModel
                         } catch (error) {
-                            console.error(`Error loading modelsss ${modelDir}:`, error);
-                            return null;
+                          throw new Error(`Unable to load character model ${modelDir}: ${error.message}`)
                         }
                     })
                 );
@@ -1856,7 +1889,7 @@ class TraitLoadingManager{
                   colors: loadedColors,
                 });
             });
-            Promise.allSettled(promises)
+            Promise.all(promises)
                 .then(() => {
                     this.setLoadPercentage(100); // Set progress to 100% once all assets are loaded
                     resolve(resultData);
@@ -1864,9 +1897,8 @@ class TraitLoadingManager{
                 })
                 .catch((error) => {
                   this.setLoadPercentage(100);
-                    console.error('An error occurred:', error);
-                    resolve(resultData);
                     this.isLoading = false;
+                  reject(error);
                 });
         });
     }

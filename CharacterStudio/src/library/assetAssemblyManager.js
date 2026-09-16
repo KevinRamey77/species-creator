@@ -123,6 +123,7 @@ export class AssetAssemblyManager {
     }
     const loaded = await this.loader.loadAsync(asset);
     const model = loaded.scene || loaded;
+    model.visible = true;
     model.name = asset.name || asset.id;
     model.position?.set?.(0, 0, 0);
     model.rotation?.set?.(0, 0, 0);

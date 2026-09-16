@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import styles from "./Create.module.css"
 import { ViewMode, ViewContext } from "../context/ViewContext"
 import CustomButton from "../components/custom-button"
@@ -9,77 +9,42 @@ import { SceneContext } from "../context/SceneContext"
 import { SoundContext } from "../context/SoundContext"
 import { AudioContext } from "../context/AudioContext"
 
-import { getAsArray } from "../library/utils"
+
+const BODY_IDS = [
+  "quaternius.body.superhero-male",
+  "quaternius.body.superhero-female",
+]
 
 function Create() {
   
-  // Translate hook
   const {t} = useContext(LanguageContext);
 
-  const { setViewMode, setIsLoading, isLoading } = React.useContext(ViewContext)
+  const { setViewMode } = React.useContext(ViewContext)
   const { playSound } = React.useContext(SoundContext)
   const { isMute } = React.useContext(AudioContext)
-  const { manifest, characterManager } = React.useContext(SceneContext)
-  const [ classes, setClasses ] = useState([]) 
-
-
-  useEffect(() => {
-
-    if (manifest?.characters != null){
-      const manifestClasses = getCharacterManifests(getAsArray(manifest.characters));
-      setClasses(manifestClasses);
-    }
-  }, [manifest])
+  const {
+    assetCatalog,
+    assetCatalogLoading,
+    assetCatalogError,
+    selectRuntimeBody,
+    runtimeBodyLoading,
+  } = React.useContext(SceneContext)
 
   const back = () => {
     setViewMode(ViewMode.LANDING)
     !isMute && playSound('backNextButton');
   }
 
-  const getCharacterManifests = (charactersArray) =>{
-      return charactersArray.map((c) => {
-        return {
-          name:c.name, 
-          portrait:c.portrait, 
-          description: c.description,
-          manifest: c.manifest,
-          icon:c.icon,
-          format:c.format,
-          disabled: c.disabled,
-          manifestAppend: getCharacterManifests(getAsArray(c.manifestAppend)),
-        }
-      })
-  }
+  const bodies = BODY_IDS.map((bodyId) => assetCatalog?.getById(bodyId)).filter(Boolean)
 
-  const selectClass = async (index) => {
-    setIsLoading(true)
-    const selectedClass = classes[index];
-
-    if (!selectedClass || selectedClass.disabled) {
-      setIsLoading(false)
-      return
+  const selectBody = async (body) => {
+    try {
+      await selectRuntimeBody(body.id)
+      setViewMode(ViewMode.APPEARANCE)
+      !isMute && playSound('classSelect')
+    } catch (error) {
+      console.error("Unable to load Quaternius body:", error)
     }
-
-    await characterManager.loadManifest(selectedClass.manifest,selectedClass.name);
-
-    setViewMode(ViewMode.APPEARANCE)
-    const promises = selectedClass.manifestAppend.map(manifestAppend => {
-      return new Promise((resolve)=>{
-        
-        characterManager.loadManifest(manifestAppend.manifest, manifestAppend.name).then(()=>{
-          resolve();
-        })
-      })
-    });
-
-    await Promise.all(promises);
-    // When Manifest is Loaded, load initial traits from given manifest
-
-    characterManager.loadInitialTraits().then(()=>{
-      setIsLoading(false)
-    })
-    !isMute && playSound('classSelect');
-
   }
 
   const hoverSound = () => {
@@ -103,29 +68,29 @@ function Create() {
       <div className={styles.topLine} />
       
       <div className={styles.classContainer}>
-        {isLoading && classes.length === 0 && (
-          <div className={styles.statusMessage}>Loading character classes...</div>
+        {assetCatalogLoading && (
+          <div className={styles.statusMessage}>Loading Quaternius bodies...</div>
         )}
-        {!isLoading && classes.length === 0 && (
+        {!assetCatalogLoading && assetCatalogError && (
+          <div className={styles.statusMessage}>Quaternius bodies could not be loaded.</div>
+        )}
+        {!assetCatalogLoading && !assetCatalogError && bodies.length === 0 && (
           <div className={styles.statusMessage}>
-            No character classes are available. Check the active manifest and asset path.
+            No Male or Female body assets are available.
           </div>
         )}
-        {classes.map((characterClass, i) => {
+        {bodies.map((body) => {
+          const isFemale = body.id.endsWith("female")
+          const name = isFemale ? "Female" : "Male"
           return (
             <div
-              key={i}
-              className={
-                !characterClass["disabled"]
-                  ? styles.class
-                  : styles.classdisabled
-              }
+              key={body.id}
+              className={styles.class}
                 role="button"
-                tabIndex={characterClass.disabled ? -1 : 0}
-                aria-disabled={characterClass.disabled}
-                aria-label={`Select ${characterClass.name}`}
-                onKeyDown={(event) => activateOnEnter(event, () => selectClass(i))}
-                onClick={() => selectClass(i)}
+                tabIndex={0}
+                aria-label={`Select ${name} Human`}
+                onKeyDown={(event) => activateOnEnter(event, () => selectBody(body))}
+                onClick={() => selectBody(body)}
               onMouseOver={
                   () => hoverSound()
               }
@@ -133,7 +98,7 @@ function Create() {
             <div
                 className={styles.classFrame}
                 style={{
-                  "backgroundImage": `url(${characterClass["portrait"]})`,
+                  "backgroundImage": "url(./assets/portraitImages/male.jpg)",
                 }}
               >
                 <div className={styles.frameContainer}>
@@ -146,9 +111,9 @@ function Create() {
 
               </div>
               
-              <div className={styles.name}>{characterClass["name"]}</div>
+              <div className={styles.name}>{name}</div>
               <div className={styles.description}>
-                {characterClass["description"]}
+                Human
               </div>
             </div>
           )
@@ -156,6 +121,7 @@ function Create() {
       </div>
 
       <div className={styles.bottomLine} />
+      {runtimeBodyLoading && <div className={styles.statusMessage}>Loading selected body...</div>}
       <div className={styles.buttonContainer}>
         { <CustomButton
           theme="light"

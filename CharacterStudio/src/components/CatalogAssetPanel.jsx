@@ -6,8 +6,6 @@ const categories = [
   { id: "body", label: "Bodies", slot: "body" },
   { id: "hair", label: "Hair", slot: "hair" },
   { id: "clothing", label: "Clothing", slot: "clothing" },
-  { id: "prop", label: "Props", slot: "prop" },
-  { id: "animation", label: "Animations", slot: "animation" },
 ]
 
 function CatalogAssetPanel() {
@@ -15,58 +13,32 @@ function CatalogAssetPanel() {
     assetCatalog,
     assetCatalogLoading,
     assetCatalogError,
-    assetAssemblyManager,
-    characterManager,
+    selectedRuntimeBody,
+    selectedRuntimeAssets = {},
+    selectRuntimeAsset,
   } = React.useContext(SceneContext)
   const [category, setCategory] = React.useState("body")
-  const [bodyId, setBodyId] = React.useState(null)
-  const [selectedIds, setSelectedIds] = React.useState({})
   const [selectionError, setSelectionError] = React.useState(null)
 
   if (assetCatalogLoading) return <div className={styles.panel}>Loading Quaternius assets...</div>
   if (assetCatalogError) return <div className={styles.panel}>Quaternius assets unavailable.</div>
   if (!assetCatalog?.isLoaded?.()) return null
-  if (!characterManager || !assetAssemblyManager) return <div className={styles.panel}>Preparing character tools...</div>
 
   const selectedCategory = categories.find((item) => item.id === category)
   const baseAssets = assetCatalog.getByCategory(category)
-  const visibleAssets = React.useMemo(() => {
-    if (category === "body") return baseAssets
-    if (!bodyId) return []
-    return assetCatalog.getCompatible(category, {
-      bodyId,
-      rig: "quaternius-standard",
-    })
-  }, [assetCatalog, baseAssets, bodyId, category])
-
-  React.useEffect(() => {
-    if (bodyId || !assetCatalog?.isLoaded?.()) return
-    const firstBody = assetCatalog.getByCategory("body")?.[0]
-    if (!firstBody || !assetAssemblyManager || !characterManager) return
-
-    void selectAsset(firstBody)
-  }, [assetCatalog, assetAssemblyManager, bodyId, characterManager])
+  const visibleAssets = category === "body"
+    ? baseAssets
+    : selectedRuntimeBody
+      ? assetCatalog.getCompatible(category, {
+          bodyId: selectedRuntimeBody.id,
+          rig: "quaternius-standard",
+        })
+      : []
 
   const selectAsset = async (asset) => {
     setSelectionError(null)
     try {
-      const nextBodyId = category === "body" ? asset.id : bodyId
-      if (category !== "body" && !nextBodyId) {
-        throw new Error("Select a body before adding this asset")
-      }
-      if (category === "body") {
-        characterManager?.removeCurrentCharacter?.()
-      }
-      if (category === "animation") {
-        await assetAssemblyManager.setAnimation(asset)
-      } else {
-        await assetAssemblyManager.setAsset(selectedCategory.slot, asset, {
-          bodyId: nextBodyId,
-          rig: "quaternius-standard",
-        })
-      }
-      if (category === "body") setBodyId(asset.id)
-      setSelectedIds((current) => ({ ...current, [category]: asset.id }))
+      await selectRuntimeAsset(asset)
     } catch (error) {
       setSelectionError(error.message)
     }
@@ -76,7 +48,7 @@ function CatalogAssetPanel() {
     <section className={styles.panel} aria-label="Quaternius assets">
       <div className={styles.header}>
         <span>Quaternius assets</span>
-        <span className={styles.status}>{bodyId ? `Body: ${bodyId}` : "Choose a body"}</span>
+        <span className={styles.status}>{selectedRuntimeBody ? `${selectedRuntimeBody.name}` : "Choose a body"}</span>
       </div>
       <div className={styles.categories} role="tablist" aria-label="Asset categories">
         {categories.map((item) => (
@@ -90,7 +62,7 @@ function CatalogAssetPanel() {
           </button>
         ))}
       </div>
-      {!bodyId && category !== "body" ? (
+      {!selectedRuntimeBody && category !== "body" ? (
         <div className={styles.error} role="alert">Select a body to unlock compatible items for this category.</div>
       ) : null}
       <div className={styles.assets}>
@@ -98,7 +70,7 @@ function CatalogAssetPanel() {
           <button
             key={asset.id}
             type="button"
-            className={selectedIds[category] === asset.id ? styles.activeAsset : styles.asset}
+            className={selectedRuntimeAssets[asset.slot || selectedCategory.slot] === asset.id ? styles.activeAsset : styles.asset}
             onClick={() => selectAsset(asset)}
           >
             {asset.name}

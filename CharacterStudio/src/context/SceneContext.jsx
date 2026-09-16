@@ -47,6 +47,10 @@ export const SceneProvider = (props) => {
   const [assetRuntimeLoader] = useState(() => new AssetRuntimeLoader({ baseURL: import.meta.env.BASE_URL }))
   const [assetCatalogLoading, setAssetCatalogLoading] = useState(true)
   const [assetCatalogError, setAssetCatalogError] = useState(null)
+  const [selectedRuntimeBody, setSelectedRuntimeBody] = useState(null)
+  const [runtimeBodyLoading, setRuntimeBodyLoading] = useState(false)
+  const [runtimeBodyError, setRuntimeBodyError] = useState(null)
+  const [selectedRuntimeAssets, setSelectedRuntimeAssets] = useState({})
 
   const [manifest, setManifest] = useState(null)
   const [debugMode, setDebugMode] = useState(false);
@@ -85,7 +89,7 @@ export const SceneProvider = (props) => {
     setLoraDataGenerator(new LoraDataGenerator(characterManager))
     setSpriteAtlasGenerator(new SpriteAtlasGenerator(characterManager))
     setThumbnailsGenerator(new ThumbnailGenerator(characterManager))
-    assetAssemblyManager.root = characterManager.characterModel
+    assetAssemblyManager.root = characterManager.characterModel || characterManager.rootModel
     assetAssemblyManager.loader = assetRuntimeLoader
     assetAssemblyManager.setCatalog(assetCatalog)
     characterManager.assetAssemblyManager = assetAssemblyManager
@@ -167,6 +171,69 @@ export const SceneProvider = (props) => {
       })
   }
 
+  const selectRuntimeBody = async (bodyId) => {
+    setRuntimeBodyLoading(true)
+    setRuntimeBodyError(null)
+
+    try {
+      const body = assetCatalog.getById(bodyId)
+      if (!body || body.category !== "body") {
+        throw new Error("The selected Quaternius body is unavailable")
+      }
+      if (!characterManager || !assetAssemblyManager.loader) {
+        throw new Error("Character rendering is still initializing")
+      }
+      if (!assetAssemblyManager.root) {
+        throw new Error("Character scene is still initializing")
+      }
+
+      characterManager.removeCurrentCharacter()
+      assetAssemblyManager.clear()
+      await assetAssemblyManager.setAsset("body", body, {
+        rig: "quaternius-standard",
+      })
+      setSelectedRuntimeBody(body)
+      setSelectedRuntimeAssets({ body: body.id })
+      moveCamera({ targetY: 0.8, distance: 3.2 })
+      return body
+    } catch (error) {
+      setSelectedRuntimeBody(null)
+      setRuntimeBodyError(error.message)
+      throw error
+    } finally {
+      setRuntimeBodyLoading(false)
+    }
+  }
+
+  const clearRuntimeBody = () => {
+    assetAssemblyManager.clear()
+    characterManager?.removeCurrentCharacter?.()
+    setSelectedRuntimeBody(null)
+    setRuntimeBodyError(null)
+    setSelectedRuntimeAssets({})
+  }
+
+  const selectRuntimeAsset = async (asset) => {
+    if (!asset || asset.category === "body") {
+      return selectRuntimeBody(asset?.id)
+    }
+
+    if (!selectedRuntimeBody) {
+      throw new Error("Select a body before adding appearance assets")
+    }
+
+    setRuntimeBodyError(null)
+    await assetAssemblyManager.setAsset(asset.slot || asset.category, asset, {
+      bodyId: selectedRuntimeBody.id,
+      rig: "quaternius-standard",
+    })
+    setSelectedRuntimeAssets((current) => ({
+      ...current,
+      [asset.slot || asset.category]: asset.id,
+    }))
+    return asset
+  }
+
   return (
     <SceneContext.Provider
       value={{
@@ -190,8 +257,15 @@ export const SceneProvider = (props) => {
         assetCatalog,
         assetCatalogLoading,
         assetCatalogError,
-          assetAssemblyManager,
-          assetRuntimeLoader,
+        assetAssemblyManager,
+        assetRuntimeLoader,
+        selectedRuntimeBody,
+        runtimeBodyLoading,
+        runtimeBodyError,
+        selectRuntimeBody,
+        clearRuntimeBody,
+        selectedRuntimeAssets,
+        selectRuntimeAsset,
       }}
     >
       {props.children}

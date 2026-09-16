@@ -99,7 +99,7 @@ describe('asset catalog', () => {
     )
   })
 
-  it('auto-selects a default body when the runtime catalog loads', async () => {
+  it('does not auto-select a body when the runtime catalog loads', async () => {
     const body = getAssetsByCategory(catalog, 'body')[0]
     const setAsset = vi.fn().mockResolvedValue({})
     const assetCatalog = {
@@ -128,10 +128,7 @@ describe('asset catalog', () => {
     )
 
     await waitFor(() => {
-      expect(setAsset).toHaveBeenCalledWith('body', body, {
-        bodyId: body.id,
-        rig: 'quaternius-standard',
-      })
+      expect(setAsset).not.toHaveBeenCalled()
     })
   })
 

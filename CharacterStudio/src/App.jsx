@@ -113,6 +113,7 @@ export default function App() {
     camera,
     controls,
     scene,
+    characterManager,
     moveCamera,
     setManifest,
     lookAtManager,

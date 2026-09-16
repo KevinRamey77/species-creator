@@ -1178,6 +1178,7 @@ export class ModelTrait{
           purchasable,
           type = '',
           directory,
+          format = 'vrm',
           name,
           thumbnail,
           cullingDistance,
@@ -1203,6 +1204,7 @@ export class ModelTrait{
 
       this.id = id;
       this.directory = directory;
+      this.format = format;
 
       this._restrictedItems = restrictedItems||[];
       if (fullDirectory){

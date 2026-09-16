@@ -1,8 +1,4 @@
 {
-  "assetsLocation": "https://m3-org.github.io/loot-assets/",
-  "traitsDirectory": "/anata/male/",
-  "thumbnailsDirectory": "./loot/thumbnails/",
-  "traitIconsDirectorySvg": "./loot/icons/",
   "displayScale": 0.8,
   "offset": [0, 0.12, 0],
   "requiredTraits": ["Body"],
@@ -19,16 +15,8 @@
       },
       "collection": [
         {
-          "id": "adult-human",
-          "name": "Adult Human",
-          "directory": "Quaternius_Test.vrm",
-          "thumbnail": "../assets/portraitImages/male.jpg",
-          "fullDirectory": "../Quaternius_Test.vrm",
-          "fullThumbnail": "../assets/portraitImages/male.jpg"
-        },
-        {
           "id": "quaternius-superhero-male",
-          "name": "Quaternius Superhero Male",
+          "name": "Superhero Male",
           "format": "gltf",
           "directory": "/quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody.gltf",
           "fullDirectory": "/quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody.gltf",
@@ -37,7 +25,7 @@
         },
         {
           "id": "quaternius-superhero-female",
-          "name": "Quaternius Superhero Female",
+          "name": "Superhero Female",
           "format": "gltf",
           "directory": "/quaternius/normalized/body/quaternius-body-superhero-female/Superhero_Female_FullBody.gltf",
           "fullDirectory": "/quaternius/normalized/body/quaternius-body-superhero-female/Superhero_Female_FullBody.gltf",

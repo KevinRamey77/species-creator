@@ -1,6 +1,13 @@
 {
   "characters": [
     {
+      "name": "Quaternius Characters",
+      "description": "Modular GLTF bodies",
+      "portrait": "./assets/portraitImages/male.jpg",
+      "manifest": "./quaternius/editor-manifest.json",
+      "format": "gltf"
+    },
+    {
       "name": "Adult Human",
       "description": "Male",
       "portrait": "./assets/portraitImages/male.jpg",

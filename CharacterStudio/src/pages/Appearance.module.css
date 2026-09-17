@@ -120,6 +120,18 @@
   color: #f4fff8;
 }
 
+.runtimeAssetClear {
+  margin: 12px 16px 0;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 180, 170, 0.45);
+  border-radius: 8px;
+  background: transparent;
+  color: #ffb4aa;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+
 /* previously in Editor.jsx */
 .sideMenu {
   position: fixed;
@@ -525,4 +537,380 @@
     right: 8px;
     top: -220px;
   }
+}
+
+/* Quaternius character editor */
+.editorPage {
+  --ink: #f3f0e8;
+  --muted: #a5a49d;
+  --line: rgba(243, 240, 232, 0.14);
+  --panel: rgba(20, 25, 26, 0.88);
+  --lime: #d2ef76;
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 30px 32px 28px 104px;
+  box-sizing: border-box;
+  color: var(--ink);
+  pointer-events: none;
+  font-family: "TTSC-Regular", "Trebuchet MS", sans-serif;
+}
+
+.editorPage > * {
+  pointer-events: auto;
+}
+
+.editorHeader {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.kicker,
+.railLabel,
+.stageEyebrow,
+.drawerEyebrow {
+  margin: 0 0 8px;
+  color: var(--lime);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.editorHeader h1 {
+  margin: 0;
+  font-family: "TTSC-Bold", "Trebuchet MS", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: normal;
+  letter-spacing: 0.01em;
+}
+
+.headerStatus {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 14px rgba(210, 239, 118, 0.8);
+}
+
+.categoryRail,
+.assetDrawer {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.categoryRail {
+  position: absolute;
+  top: 126px;
+  bottom: 82px;
+  left: 32px;
+  width: 84px;
+  padding: 18px 8px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.railLabel {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.categoryButton {
+  width: 68px;
+  min-height: 62px;
+  padding: 5px 2px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.categoryButton:hover,
+.categoryButtonActive {
+  background: rgba(210, 239, 118, 0.12);
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.categoryIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 7px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-family: "TTSC-Bold", sans-serif;
+  font-size: 13px;
+}
+
+.characterStage {
+  position: absolute;
+  top: 124px;
+  right: 382px;
+  bottom: 82px;
+  left: 112px;
+  overflow: hidden;
+  border: 1px solid rgba(243, 240, 232, 0.1);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(31, 39, 38, 0.16), rgba(7, 11, 12, 0.28));
+}
+
+.stageGrid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background-image: linear-gradient(rgba(243, 240, 232, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(243, 240, 232, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, transparent, black 22%, black 75%, transparent);
+}
+
+.stageCopy {
+  position: absolute;
+  top: 26px;
+  left: 28px;
+  max-width: 250px;
+}
+
+.stageCopy h2,
+.drawerHeader h2 {
+  margin: 0;
+  font-family: "TTSC-Bold", "Trebuchet MS", sans-serif;
+  font-size: 21px;
+  font-weight: normal;
+}
+
+.stageCopy p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.stageLoading,
+.stageError {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(10, 14, 14, 0.75);
+  color: var(--muted);
+  font-size: 12px;
+  transform: translate(-50%, -50%);
+}
+
+.stageError,
+.drawerError {
+  color: #ffb5a8;
+}
+
+.stageFooter {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stageDivider {
+  width: 28px;
+  height: 1px;
+  background: var(--line);
+}
+
+.assetDrawer {
+  position: absolute;
+  top: 124px;
+  right: 32px;
+  bottom: 82px;
+  width: 318px;
+  padding: 24px 18px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.clearButton {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+}
+
+.clearButton:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+.assetList {
+  height: calc(100% - 79px);
+  padding-top: 14px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.assetCard {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 9px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: rgba(243, 240, 232, 0.045);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.assetCard:hover,
+.assetCardActive {
+  border-color: rgba(210, 239, 118, 0.58);
+  background: rgba(210, 239, 118, 0.1);
+  transform: translateX(-2px);
+}
+
+.assetSwatch {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: "TTSC-Bold", sans-serif;
+  font-size: 18px;
+}
+
+.assetSwatch1 { background: #687b74; }
+.assetSwatch2 { background: #8b6c59; }
+.assetSwatch3 { background: #536b85; }
+.assetSwatch4 { background: #9b7b43; }
+.assetSwatch5 { background: #725d7a; }
+
+.assetInfo {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.assetInfo strong {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetInfo small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.assetCheck {
+  color: var(--lime);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.drawerMessage,
+.drawerError {
+  margin: 20px 2px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.editorActions {
+  position: absolute;
+  bottom: 24px;
+  left: 104px;
+}
+
+@media (max-width: 900px) {
+  .editorPage { padding-left: 86px; }
+  .characterStage { right: 328px; left: 94px; }
+  .assetDrawer { width: 278px; right: 20px; }
+  .categoryRail { left: 18px; }
+  .editorActions { left: 86px; }
+}
+
+@media (max-width: 680px) {
+  .editorPage { padding: 20px 14px 88px; }
+  .editorHeader h1 { font-size: 1.8rem; }
+  .headerStatus { display: none; }
+  .categoryRail {
+    top: auto;
+    right: 14px;
+    bottom: 20px;
+    left: 14px;
+    width: auto;
+    height: 62px;
+    padding: 7px 10px;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .railLabel { display: none; }
+  .categoryButton { min-height: 50px; }
+  .categoryIcon { width: 24px; height: 24px; margin-bottom: 3px; font-size: 11px; }
+  .characterStage { top: 104px; right: 14px; bottom: 340px; left: 14px; }
+  .assetDrawer { top: auto; right: 14px; bottom: 94px; left: 14px; width: auto; height: 218px; }
+  .assetList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; height: calc(100% - 65px); }
+  .assetCard { min-height: 56px; margin: 0; }
+  .assetSwatch { flex-basis: 32px; width: 32px; height: 32px; font-size: 14px; }
+  .assetCheck { display: none; }
+  .editorActions { bottom: 30px; left: 24px; }
 }

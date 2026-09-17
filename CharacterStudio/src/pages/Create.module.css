@@ -12,6 +12,11 @@
   background:
     radial-gradient(circle at 15% 12%, rgba(122, 170, 255, 0.18), transparent 25%),
     linear-gradient(180deg, rgba(5, 8, 12, 0.1), rgba(5, 8, 12, 0.3));
+  pointer-events: none;
+}
+
+.container > * {
+  pointer-events: auto;
 }
 
 .refreshContainer {
@@ -264,6 +269,16 @@
   width: 100%;
   height: auto;
   max-width: 230px;
+}
+
+.classContainer .classFrame .portraitIllustration {
+  position: relative;
+  z-index: 1;
+  width: 62%;
+  max-width: 158px;
+  height: auto;
+  opacity: 0.96;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
 .classContainer .classFrame .lockedContainer {

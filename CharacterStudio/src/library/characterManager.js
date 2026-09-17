@@ -113,6 +113,7 @@ export class CharacterManager {
 
       this.rootModel.add(this.characterModel)
       this.renderCamera = renderCamera;
+      this.runtimeBodyAuthoritative = false;
 
       this.manifestDataManager = new ManifestDataManager();
       if (manifestURL){
@@ -165,6 +166,9 @@ export class CharacterManager {
           }
         }
       }
+    }
+    setRuntimeBodyAuthoritative(authoritative = true){
+      this.runtimeBodyAuthoritative = authoritative;
     }
     unlockManifestByIndex(index, testWallet = null){
       console.log(index);
@@ -1742,6 +1746,10 @@ export class CharacterManager {
           }
           return;
       }
+
+        if (this.runtimeBodyAuthoritative && traitGroupID === 'Body') {
+          return;
+        }
 
       let loadedModel = null;
       let vrm = null;

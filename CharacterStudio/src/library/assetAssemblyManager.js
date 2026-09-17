@@ -51,6 +51,46 @@ const attachmentBoneAliases = (attachmentBone) => ({
   leftHand: ["hand_l"],
 }[attachmentBone] || []);
 
+const findSkinnedMesh = (root) => {
+  let result = null;
+  root?.traverse?.((child) => {
+    if (!result && child.isSkinnedMesh && child.skeleton) result = child;
+  });
+  return result;
+};
+
+const rebindToBodySkeleton = (model, root) => {
+  const bodyMesh = findSkinnedMesh(root);
+  if (!bodyMesh) return false;
+
+  const bodySkeleton = bodyMesh.skeleton;
+  const bodyBonesByName = new Map(
+    bodySkeleton.bones.map((bone) => [bone.name.toLowerCase(), bone]),
+  );
+  let rebound = false;
+
+  model.traverse?.((child) => {
+    if (!child.isSkinnedMesh || !child.skeleton) return;
+
+    const bones = child.skeleton.bones.map((bone) => bodyBonesByName.get(bone.name.toLowerCase()));
+    const missingBone = child.skeleton.bones.find((bone, index) => !bones[index]);
+    if (missingBone) {
+      throw new Error(`Body skeleton is missing appearance bone ${missingBone.name}`);
+    }
+
+    const boneInverses = child.skeleton.boneInverses?.length === bones.length
+      ? child.skeleton.boneInverses.map((inverse) => inverse.clone())
+      : bones.map((bone) => {
+        const bodyBoneIndex = bodySkeleton.bones.indexOf(bone);
+        return bodySkeleton.boneInverses[bodyBoneIndex].clone();
+      });
+    child.bind(new THREE.Skeleton(bones, boneInverses), child.bindMatrix.clone());
+    rebound = true;
+  });
+
+  return rebound;
+};
+
 export class AssetAssemblyManager {
   constructor({ root, catalog, loader = null, slots = DEFAULT_SLOTS } = {}) {
     this.root = root || new THREE.Object3D();
@@ -123,6 +163,10 @@ export class AssetAssemblyManager {
     }
     const loaded = await this.loader.loadAsync(asset);
     const model = loaded.scene || loaded;
+    model.traverse?.((child) => {
+      child.visible = true;
+      if (child.isSkinnedMesh) child.frustumCulled = false;
+    });
     model.visible = true;
     model.name = asset.name || asset.id;
     model.position?.set?.(0, 0, 0);
@@ -133,6 +177,10 @@ export class AssetAssemblyManager {
       model.parent.remove(model);
     }
 
+    const usesBodySkeleton = targetSlot !== "body"
+      && targetSlot !== "outfit"
+      && rebindToBodySkeleton(model, this.root);
+
     if (targetSlot === "body" && this.getActiveAsset("body")?.id !== asset.id) {
       this.animationMixer?.stopAllAction();
       this.animationMixer = null;
@@ -141,6 +189,12 @@ export class AssetAssemblyManager {
         .filter((activeSlot) => activeSlot !== "body")
         .forEach((activeSlot) => this.removeAsset(activeSlot));
     }
+    if (asset.category === "clothing") {
+      const conflictingSlots = targetSlot === "outfit"
+        ? [...this.activeAssets.keys()].filter((slot) => slot !== "body" && slot !== "hair")
+        : ["outfit"];
+      conflictingSlots.forEach((slot) => this.removeAsset(slot));
+    }
     const previous = this.activeAssets.get(targetSlot);
     if (previous) {
       previous.model.parent?.remove?.(previous.model);
@@ -148,7 +202,7 @@ export class AssetAssemblyManager {
       disposeObject(previous.model);
     }
 
-    if (asset.attachmentBone) {
+    if (asset.attachmentBone && !usesBodySkeleton) {
       const attachmentTarget = findAttachmentTarget(this.root, asset.attachmentBone);
       if (!attachmentTarget) {
         disposeObject(model);
@@ -159,7 +213,44 @@ export class AssetAssemblyManager {
       this.root.add(model);
     }
 
+    model.updateMatrixWorld?.(true);
+    model.traverse?.((child) => {
+      if (!child.isSkinnedMesh || !child.skeleton) return;
+      const hasMatrixWorld = child.skeleton.bones?.every((bone) => bone.matrixWorld?.elements);
+      if (hasMatrixWorld) child.skeleton.update?.();
+      child.computeBoundingBox?.();
+      child.computeBoundingSphere?.();
+    });
+    this.root.updateMatrixWorld?.(true);
+
     this.activeAssets.set(targetSlot, { asset, model });
+    const bounds = model?.isObject3D ? new THREE.Box3().setFromObject(model) : null;
+    const size = bounds?.getSize(new THREE.Vector3()) || null;
+    const diagnostics = typeof window !== "undefined"
+      ? (window.__characterStudioDiagnostics ||= { events: [] })
+      : null;
+    const assemblyEvent = {
+      type: "asset-attached",
+      id: asset.id,
+      slot: targetSlot,
+      meshCount: (() => {
+        let count = 0;
+        model.traverse?.((child) => { if (child.isMesh) count += 1; });
+        return count;
+      })(),
+      parent: model.parent?.name || null,
+      visible: model.visible,
+      position: model.position?.toArray?.() || null,
+      rotation: model.rotation?.toArray?.() || null,
+      scale: model.scale?.toArray?.() || null,
+      bounds: bounds ? {
+        min: bounds.min.toArray(),
+        max: bounds.max.toArray(),
+        size: size.toArray(),
+      } : null,
+    };
+    console.info("[CharacterStudio] Runtime asset attached", assemblyEvent);
+    diagnostics?.events.push(assemblyEvent);
     return model;
   }
 

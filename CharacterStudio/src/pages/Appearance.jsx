@@ -20,6 +20,10 @@ import { ChromePicker   } from 'react-color'
 import RightPanel from "../components/RightPanel"
 import SaleIcon from "../images/sale-icon.png"
 import MenuTitle from "../components/MenuTitle"
+import {
+  EDITOR_ASSET_CATEGORIES,
+  getEditorAssetSlots,
+} from "../library/assetCatalog"
 
   /**
    * @typedef {import("../library/CharacterManifestData.js").TraitModelsGroup} TraitModelsGroup
@@ -592,17 +596,22 @@ function Appearance() {
     assetCatalogError,
     selectedRuntimeBody,
     selectedRuntimeAssets,
-    runtimeBodyLoading,
-    runtimeBodyError,
     clearRuntimeBody,
     selectRuntimeAsset,
+    clearRuntimeAsset,
   } = React.useContext(SceneContext)
   const { t } = useContext(LanguageContext)
   const [assetCategory, setAssetCategory] = React.useState("hair")
-  const assetCategories = [
-    { id: "hair", label: "Hair" },
-    { id: "clothing", label: "Clothing" },
-  ]
+  const [assetSelectionError, setAssetSelectionError] = React.useState(null)
+  const assetCategories = EDITOR_ASSET_CATEGORIES.map((category) => ({
+    ...category,
+    icon: category.label.slice(0, 1),
+  }))
+
+  React.useEffect(() => {
+    setAssetCategory("hair")
+    setAssetSelectionError(null)
+  }, [selectedRuntimeBody?.id])
 
   const back = () => {
     clearRuntimeBody()
@@ -610,85 +619,109 @@ function Appearance() {
   }
 
   const bodyName = selectedRuntimeBody?.id.endsWith("female") ? "Female" : "Male"
-  const compatibleAssets = selectedRuntimeBody && assetCatalog
-    ? assetCatalog.getCompatible(assetCategory, {
-        bodyId: selectedRuntimeBody.id,
-        rig: "quaternius-standard",
-      })
+  const visibleAssets = assetCatalog
+    ? assetCategory === "body"
+      ? assetCatalog.getByEditorCategory(assetCategory)
+      : selectedRuntimeBody
+        ? assetCatalog.getCompatibleEditorCategory(assetCategory, {
+            bodyId: selectedRuntimeBody.id,
+            rig: "quaternius-standard",
+          })
+        : []
     : []
 
+  const selectedAssetForCategory = getEditorAssetSlots(assetCategory)
+    .map((slot) => selectedRuntimeAssets?.[slot])
+    .map((assetId) => assetCatalog?.getById(assetId))
+    .find(Boolean)
+
   const selectAsset = async (asset) => {
+    setAssetSelectionError(null)
     try {
       await selectRuntimeAsset(asset)
     } catch (error) {
-      console.error("Unable to load Quaternius appearance asset:", error)
+      setAssetSelectionError(error.message)
     }
   }
 
+  const clearAssetCategory = () => {
+    getEditorAssetSlots(assetCategory).forEach((slot) => clearRuntimeAsset(slot))
+    setAssetSelectionError(null)
+  }
+
+  const activeCategory = assetCategories.find((category) => category.id === assetCategory)
+
   return (
-    <main className={styles.focusedContainer}>
-      <div className="sectionTitle">{t("pageTitles.chooseAppearance")}</div>
-      <section className={styles.previewStatus} aria-live="polite">
-        <div className={styles.previewEyebrow}>Quaternius Human</div>
-        {assetCatalogLoading && <h1>Loading bodies...</h1>}
-        {!assetCatalogLoading && assetCatalogError && (
-          <h1>Asset catalog unavailable</h1>
+    <main className={styles.editorPage}>
+      <header className={styles.editorHeader}>
+        <div>
+          <p className={styles.kicker}>Quaternius character studio</p>
+          <h1>{t("pageTitles.chooseAppearance")}</h1>
+        </div>
+        <div className={styles.headerStatus}>
+          <span className={styles.statusDot} />
+          {selectedRuntimeBody ? `${bodyName} base ready` : "New character"}
+        </div>
+      </header>
+
+      <aside className={styles.categoryRail} aria-label="Appearance categories">
+        <div className={styles.railLabel}>Build</div>
+        {assetCategories.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            className={`${styles.categoryButton} ${assetCategory === category.id ? styles.categoryButtonActive : ""}`}
+            onClick={() => setAssetCategory(category.id)}
+          >
+            <span className={styles.categoryIcon} aria-hidden="true">{category.icon}</span>
+            <span>{category.shortLabel}</span>
+          </button>
+        ))}
+      </aside>
+
+      <section className={styles.assetDrawer} aria-label={`${activeCategory.label} options`}>
+        <div className={styles.drawerHeader}>
+          <div>
+            <span className={styles.drawerEyebrow}>Select asset</span>
+            <h2>{activeCategory.label}</h2>
+          </div>
+          {assetCategory !== "body" && selectedAssetForCategory && (
+            <button type="button" className={styles.clearButton} onClick={clearAssetCategory}>Clear</button>
+          )}
+        </div>
+        {assetCatalogLoading && <p className={styles.drawerMessage}>Loading Quaternius library...</p>}
+        {assetCatalogError && <p className={styles.drawerMessage}>Asset catalog unavailable.</p>}
+        {!assetCatalogLoading && !assetCatalogError && assetCategory !== "body" && !selectedRuntimeBody && (
+          <p className={styles.drawerMessage}>Choose a body first to unlock compatible assets.</p>
         )}
-        {!assetCatalogLoading && !assetCatalogError && runtimeBodyLoading && (
-          <h1>Rendering {bodyName}...</h1>
+        {!assetCatalogLoading && !assetCatalogError && (assetCategory === "body" || selectedRuntimeBody) && (
+          <div className={styles.assetList}>
+            {visibleAssets.map((asset, index) => {
+              const slot = asset.slot || asset.category
+              const active = selectedRuntimeAssets?.[slot] === asset.id
+              return (
+                <button
+                  key={asset.id}
+                  type="button"
+                  className={`${styles.assetCard} ${active ? styles.assetCardActive : ""}`}
+                  onClick={() => selectAsset(asset)}
+                >
+                  <span className={`${styles.assetSwatch} ${styles[`assetSwatch${(index % 5) + 1}`]}`}>{asset.name.slice(0, 1)}</span>
+                  <span className={styles.assetInfo}>
+                    <strong>{asset.name}</strong>
+                    <small>{asset.slot || asset.attachmentBone || "Quaternius asset"}</small>
+                  </span>
+                  {active && <span className={styles.assetCheck}>Selected</span>}
+                </button>
+              )
+            })}
+            {visibleAssets.length === 0 && <p className={styles.drawerMessage}>No compatible assets available.</p>}
+          </div>
         )}
-        {!assetCatalogLoading && !assetCatalogError && !runtimeBodyLoading && !selectedRuntimeBody && (
-          <h1>Select a body to begin</h1>
-        )}
-        {!runtimeBodyLoading && selectedRuntimeBody && !runtimeBodyError && <h1>{bodyName} Human</h1>}
-        {runtimeBodyError && <p className={styles.errorMessage}>{runtimeBodyError}</p>}
+        {assetSelectionError && <p className={styles.drawerError}>{assetSelectionError}</p>}
       </section>
-      {!assetCatalogLoading && !assetCatalogError && selectedRuntimeBody && !runtimeBodyError && (
-        <>
-          <aside className={styles.sideMenu} aria-label="Appearance categories">
-            <MenuTitle title="Appearance" left={20} />
-            <div className={styles.bottomLine} />
-            <div className={styles.scrollContainer}>
-              <div className={styles["editor-container"]}>
-                {assetCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    className={`${styles.editorButton} ${assetCategory === category.id ? styles.editorButtonActive : ""}`}
-                    onClick={() => setAssetCategory(category.id)}
-                  >
-                    <span className={styles.editorText}>{category.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </aside>
-          <section className={styles.selectorContainerPos} aria-label={`${assetCategory} options`}>
-            <MenuTitle title={assetCategories.find((category) => category.id === assetCategory)?.label} width={180} left={20} />
-            <div className={styles.bottomLine} />
-            <div className={styles.scrollContainerOptions}>
-              <div className={styles.runtimeAssetGrid}>
-                {compatibleAssets.map((asset) => {
-                  const slot = asset.slot || asset.category
-                  const active = selectedRuntimeAssets?.[slot] === asset.id
-                  return (
-                    <button
-                      key={asset.id}
-                      type="button"
-                      className={`${styles.runtimeAssetButton} ${active ? styles.runtimeAssetButtonActive : ""}`}
-                      onClick={() => selectAsset(asset)}
-                    >
-                      {asset.name}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-      <div className={styles.focusedHint}>Choose a category, then select a compatible asset.</div>
-      <div className={styles.focusedButtonContainer}>
+
+      <div className={styles.editorActions}>
         <CustomButton
           theme="light"
           text={t("callToAction.back")}

@@ -1,6 +1,7 @@
 import { AssetCatalog } from "../library/assetCatalog"
 import { AssetAssemblyManager } from "../library/assetAssemblyManager"
 import { AssetRuntimeLoader } from "../library/assetRuntimeLoader"
+import * as THREE from "three"
 import React, { createContext, useEffect, useState } from "react"
 
 import gsap from "gsap"
@@ -58,8 +59,17 @@ export const SceneProvider = (props) => {
 
   useEffect(() => {
     const catalogURL = `${import.meta.env.BASE_URL}quaternius/runtime-catalog.json`
+    console.info("[CharacterStudio] Loading runtime catalog", { catalogURL })
     assetCatalog.load(catalogURL)
+      .then((catalog) => {
+        const maleBody = catalog.assets.find((asset) => asset.id === "quaternius.body.superhero-male")
+        console.info("[CharacterStudio] Runtime catalog loaded", {
+          assetCount: catalog.assets.length,
+          maleBody,
+        })
+      })
       .catch((error) => {
+        console.error("[CharacterStudio] Runtime catalog failed", error)
         setAssetCatalogError(error)
       })
       .finally(() => {
@@ -93,6 +103,12 @@ export const SceneProvider = (props) => {
     assetAssemblyManager.loader = assetRuntimeLoader
     assetAssemblyManager.setCatalog(assetCatalog)
     characterManager.assetAssemblyManager = assetAssemblyManager
+    characterManager.setRuntimeBodyAuthoritative(true)
+    console.info("[CharacterStudio] Scene and asset managers initialized", {
+      sceneChildren: scene.children.length,
+      characterRootAttached: scene.getObjectById(characterManager.characterModel?.id) === characterManager.characterModel,
+      assemblyRoot: assetAssemblyManager.root?.name || "unnamed",
+    })
   },[])
 
 
@@ -101,13 +117,21 @@ export const SceneProvider = (props) => {
       isDebug = !debugMode;
 
     setDebugMode(isDebug);
-    scene.traverse((child) => {
+    scene?.traverse((child) => {
       if (child.isMesh) {
         if (child.setDebugMode){
           child.setDebugMode(isDebug);
         }
       }
     });
+  }
+
+  const resetRuntimeEditorState = () => {
+    toggleDebugMode(false)
+    lookAtManager?.setActive(false)
+    animationManager?.enableMouseLook(false)
+    animationManager?.pause()
+    characterManager?.setCharacterVerticalOffset?.(0)
   }
   useEffect(() => {
     if (manifest != null && animationManager != null){
@@ -171,6 +195,28 @@ export const SceneProvider = (props) => {
       })
   }
 
+    const frameRuntimeBody = (model) => {
+      if (!camera || !controls || !model) return
+
+      const bounds = new THREE.Box3().setFromObject(model)
+      if (bounds.isEmpty()) return
+
+      const center = bounds.getCenter(new THREE.Vector3())
+      const size = bounds.getSize(new THREE.Vector3())
+      const radius = Math.max(size.x, size.y, size.z) / 2
+      const distance = Math.min(
+        10,
+        Math.max(1.5, radius / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.35),
+      )
+
+      moveCamera({
+        targetX: center.x,
+        targetY: center.y,
+        targetZ: center.z,
+        distance,
+      })
+    }
+
   const selectRuntimeBody = async (bodyId) => {
     setRuntimeBodyLoading(true)
     setRuntimeBodyError(null)
@@ -187,14 +233,28 @@ export const SceneProvider = (props) => {
         throw new Error("Character scene is still initializing")
       }
 
+      resetRuntimeEditorState()
       characterManager.removeCurrentCharacter()
       assetAssemblyManager.clear()
-      await assetAssemblyManager.setAsset("body", body, {
+      const model = await assetAssemblyManager.setAsset("body", body, {
         rig: "quaternius-standard",
+      })
+      const rootAttached = scene?.getObjectById(characterManager.characterModel?.id) === characterManager.characterModel
+      const bodyAttached = characterManager.characterModel?.getObjectById?.(model.id) === model
+      console.info("[CharacterStudio] Male body render path complete", {
+        bodyId,
+        rootAttached,
+        bodyAttached,
+        camera: camera ? {
+          position: camera.position.toArray(),
+          near: camera.near,
+          far: camera.far,
+        } : null,
+        target: controls?.target?.toArray?.() || null,
       })
       setSelectedRuntimeBody(body)
       setSelectedRuntimeAssets({ body: body.id })
-      moveCamera({ targetY: 0.8, distance: 3.2 })
+      frameRuntimeBody(model)
       return body
     } catch (error) {
       setSelectedRuntimeBody(null)
@@ -234,6 +294,26 @@ export const SceneProvider = (props) => {
     return asset
   }
 
+  const clearRuntimeAsset = (slot) => {
+    if (slot === "clothing") {
+      Object.keys(assetAssemblyManager.getActiveSlots())
+        .filter((activeSlot) => activeSlot !== "body" && activeSlot !== "hair")
+        .forEach((activeSlot) => assetAssemblyManager.removeAsset(activeSlot))
+      setSelectedRuntimeAssets((current) => Object.fromEntries(
+        Object.entries(current).filter(([activeSlot]) => activeSlot === "body" || activeSlot === "hair"),
+      ))
+      return
+    }
+
+    if (!slot || slot === "body") return
+    assetAssemblyManager.removeAsset(slot)
+    setSelectedRuntimeAssets((current) => {
+      const next = { ...current }
+      delete next[slot]
+      return next
+    })
+  }
+
   return (
     <SceneContext.Provider
       value={{
@@ -259,6 +339,7 @@ export const SceneProvider = (props) => {
         assetCatalogError,
         assetAssemblyManager,
         assetRuntimeLoader,
+        resetRuntimeEditorState,
         selectedRuntimeBody,
         runtimeBodyLoading,
         runtimeBodyError,
@@ -266,6 +347,7 @@ export const SceneProvider = (props) => {
         clearRuntimeBody,
         selectedRuntimeAssets,
         selectRuntimeAsset,
+        clearRuntimeAsset,
       }}
     >
       {props.children}

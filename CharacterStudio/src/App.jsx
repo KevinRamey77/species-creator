@@ -1,26 +1,17 @@
-import React, { Fragment, useContext, useEffect, useState } from "react"
+import React, { Fragment, useContext, useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
 import { LanguageContext } from "./context/LanguageContext"
 import { SceneContext } from "./context/SceneContext"
 import { ViewContext, ViewMode } from "./context/ViewContext"
 import { EffectManager } from "./library/effectManager"
-//import { AnimationManager } from "./library/animationManager"
 import MessageWindow from "./components/MessageWindow"
 
 import Background from "./components/Background"
 
 import Appearance from "./pages/Appearance"
-import BatchDownload from "./pages/BatchDownload"
-import BatchManifest from "./pages/BatchManifest"
-import Claim from "./pages/Claim"
 import Create from "./pages/Create"
 import Landing from "./pages/Landing"
-import Load from "./pages/Load"
-import Mint from "./pages/Mint"
-import Optimizer from "./pages/Optimizer"
-import Save from "./pages/Save"
-import Wallet from "./pages/Wallet"
 
 export const resolveAssetImportPath = (assetPath) => {
   const normalized = typeof assetPath === "string" ? assetPath.trim() : ""
@@ -117,9 +108,13 @@ export default function App() {
     moveCamera,
     setManifest,
     lookAtManager,
-    showEnvironmentModels
+    showEnvironmentModels,
+    assetCatalog,
+    assetCatalogLoading,
+    selectRuntimeBody,
+    selectedRuntimeBody,
   } = useContext(SceneContext)
-  const { viewMode } = useContext(ViewContext)
+  const { viewMode, setViewMode } = useContext(ViewContext)
 
   effectManager.camera = camera
   effectManager.scene = scene
@@ -159,20 +154,8 @@ export default function App() {
   // map current app mode to a page
   const pages = {
     [ViewMode.LANDING]: <Landing />,
-    [ViewMode.APPEARANCE]: (
-      <Appearance
-        confirmDialog={confirmDialog}
-      />
-    ),
-    [ViewMode.OPTIMIZER]:<Optimizer/>,
     [ViewMode.CREATE]: <Create />,
-    [ViewMode.WALLET]: <Wallet />,
-    [ViewMode.CLAIM]: <Claim />,
-    [ViewMode.BATCHMANIFEST]: <BatchManifest />,
-    [ViewMode.BATCHDOWNLOAD]: <BatchDownload />,
-    [ViewMode.LOAD]: <Load />,
-    [ViewMode.MINT]: <Mint />,
-    [ViewMode.SAVE]: <Save />,
+    [ViewMode.APPEARANCE]: <Appearance confirmDialog={confirmDialog} />,
   }
 
   let lastTap = 0
@@ -221,9 +204,6 @@ export default function App() {
   return (
     <Fragment>
       
-      <div className="generalTitle">Character Studio</div>
-
-      {/* <LanguageSwitch /> */}
       <MessageWindow
         confirmDialogText = {confirmDialogText}
         confirmDialogCallback = {confirmDialogCallback}
@@ -232,7 +212,7 @@ export default function App() {
       />
       <Background />
       
-      {pages[viewMode]}
+      {pages[viewMode] ?? pages[ViewMode.LANDING]}
       
     </Fragment>
   )

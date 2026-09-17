@@ -48,23 +48,23 @@ const getLibrary = (provider) => {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Web3ReactProvider getLibrary={getLibrary}>
-    <AccountProvider>
-      <LanguageProvider>
-        <AudioProvider>
-          <ViewProvider>
-            <SceneProvider>
-              <SoundProvider>
-                <AppErrorBoundary>
+  <AppErrorBoundary>
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <AccountProvider>
+        <LanguageProvider>
+          <AudioProvider>
+            <ViewProvider>
+              <SceneProvider>
+                <SoundProvider>
                   <Suspense fallback={<main style={{ padding: "2rem", color: "white", fontFamily: "sans-serif" }}>Loading Character Studio...</main>}>
                     <App />
                   </Suspense>
-                </AppErrorBoundary>
-              </SoundProvider>
-            </SceneProvider>
-          </ViewProvider>
-        </AudioProvider>
-      </LanguageProvider>
-    </AccountProvider>
-  </Web3ReactProvider>,
+                </SoundProvider>
+              </SceneProvider>
+            </ViewProvider>
+          </AudioProvider>
+        </LanguageProvider>
+      </AccountProvider>
+    </Web3ReactProvider>
+  </AppErrorBoundary>,
 )

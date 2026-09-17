@@ -1,3 +1,11 @@
+.container {
+    pointer-events: none;
+}
+
+.container > * {
+    pointer-events: auto;
+}
+
 .buttonContainer {
     position: relative;
     display: flex;

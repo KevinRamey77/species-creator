@@ -11,6 +11,55 @@ const ASSET_FORMATS = new Set(["fbx", "glb", "gltf", "obj"]);
 
 const REQUIRED_FIELDS = ["id", "name", "category", "source", "format", "path"];
 
+export const EDITOR_ASSET_CATEGORIES = [
+  { id: "body", label: "Body", shortLabel: "Body" },
+  { id: "hair", label: "Hair", shortLabel: "Hair" },
+  { id: "head", label: "Head", shortLabel: "Head" },
+  { id: "torso", label: "Torso", shortLabel: "Torso" },
+  { id: "arms", label: "Arms", shortLabel: "Arms" },
+  { id: "legs", label: "Legs", shortLabel: "Legs" },
+  { id: "feet", label: "Feet", shortLabel: "Feet" },
+  { id: "shoulders", label: "Shoulders", shortLabel: "Shoulders" },
+  { id: "weapons", label: "Weapons", shortLabel: "Weapons" },
+  { id: "equipment", label: "Equipment", shortLabel: "Equipment" },
+  { id: "outfits", label: "Outfits", shortLabel: "Outfits" },
+];
+
+const EDITOR_CATEGORY_SLOTS = {
+  body: ["body"],
+  hair: ["hair"],
+  head: ["clothing-head-hood"],
+  torso: ["clothing-body"],
+  arms: ["clothing-arms"],
+  legs: ["clothing-legs"],
+  feet: ["clothing-feet"],
+  shoulders: ["clothing-acc-pauldrons", "clothing-acc-pauldron"],
+  weapons: ["prop"],
+  equipment: ["prop"],
+  outfits: ["outfit"],
+};
+
+const WEAPON_NAME_PARTS = ["sword", "dagger", "hammer", "axe", "bow", "arrow", "dart"];
+
+const isWeaponProp = (asset) => {
+  if (asset?.category !== "prop") return false;
+  const metadata = `${asset.name || ""} ${asset.sourcePath || ""}`.toLowerCase();
+  return WEAPON_NAME_PARTS.some((part) => metadata.includes(part));
+};
+
+export const getEditorAssetSlots = (category) => [...(EDITOR_CATEGORY_SLOTS[category] || [])];
+
+export const getEditorAssetCategory = (asset) => {
+  if (!asset) return null;
+  if (asset.category === "body") return "body";
+  if (asset.category === "hair") return "hair";
+  if (asset.category === "prop") return isWeaponProp(asset) ? "weapons" : "equipment";
+  if (asset.category !== "clothing") return null;
+
+  return Object.entries(EDITOR_CATEGORY_SLOTS)
+    .find(([, slots]) => slots.includes(asset.slot))?.[0] || null;
+};
+
 const isNonEmptyString = (value) => typeof value === "string" && value.trim() !== "";
 
 const isStringArray = (value) => Array.isArray(value) && value.every(isNonEmptyString);
@@ -145,6 +194,16 @@ export class AssetCatalog {
 
   getCompatible(category, compatibility) {
     return this.getByCategory(category).filter((asset) => isAssetCompatible(asset, compatibility));
+  }
+
+  getByEditorCategory(category) {
+    if (!this.catalog) return [];
+    assertValidAssetCatalog(this.catalog);
+    return this.getAll().filter((asset) => getEditorAssetCategory(asset) === category);
+  }
+
+  getCompatibleEditorCategory(category, compatibility) {
+    return this.getByEditorCategory(category).filter((asset) => isAssetCompatible(asset, compatibility));
   }
 }
 

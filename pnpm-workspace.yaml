@@ -1,2 +1,15 @@
+packages:
+  - '.'
+  - 'CharacterStudio'
+
 allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  bigint-buffer: false
+  bufferutil: false
+  esbuild: true
+  keccak: false
+  secp256k1: false
   unrs-resolver: false
+  utf-8-validate: false
+  workerd: false

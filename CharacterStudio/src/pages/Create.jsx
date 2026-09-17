@@ -28,6 +28,7 @@ function Create() {
     assetCatalogError,
     selectRuntimeBody,
     runtimeBodyLoading,
+    runtimeBodyError,
   } = React.useContext(SceneContext)
 
   const back = () => {
@@ -86,21 +87,42 @@ function Create() {
             <div
               key={body.id}
               className={styles.class}
-                role="button"
-                tabIndex={0}
-                aria-label={`Select ${name} Human`}
-                onKeyDown={(event) => activateOnEnter(event, () => selectBody(body))}
-                onClick={() => selectBody(body)}
-              onMouseOver={
-                  () => hoverSound()
-              }
+              role="button"
+              tabIndex={0}
+              aria-label={`Select ${name} Human`}
+              onKeyDown={(event) => activateOnEnter(event, () => selectBody(body))}
+              onClick={() => selectBody(body)}
+              onMouseOver={() => hoverSound()}
             >
-            <div
-                className={styles.classFrame}
-                style={{
-                  "backgroundImage": "url(./assets/portraitImages/male.jpg)",
-                }}
-              >
+              <div className={styles.classFrame}>
+                <svg
+                  className={styles.portraitIllustration}
+                  viewBox="0 0 200 200"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="100"
+                    cy="52"
+                    r="22"
+                    fill={isFemale ? "#f6d9df" : "#dfeaff"}
+                    stroke="#edf2ff"
+                    strokeWidth="5"
+                  />
+                  <path
+                    d={
+                      isFemale
+                        ? "M75 46 C87 22, 113 22, 125 46 L118 68 H82 Z"
+                        : "M80 42 H120 L116 64 H84 Z"
+                    }
+                    fill={isFemale ? "#d77ca8" : "#7ea3d9"}
+                  />
+                  <path d="M100 74 L100 120" stroke="#edf2ff" strokeWidth="8" strokeLinecap="round" />
+                  <path d="M100 92 L74 112" stroke="#edf2ff" strokeWidth="8" strokeLinecap="round" />
+                  <path d="M100 92 L126 112" stroke="#edf2ff" strokeWidth="8" strokeLinecap="round" />
+                  <path d="M100 120 L82 152" stroke="#edf2ff" strokeWidth="8" strokeLinecap="round" />
+                  <path d="M100 120 L118 152" stroke="#edf2ff" strokeWidth="8" strokeLinecap="round" />
+                  <path d="M88 82 L111 82" stroke="#edf2ff" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+                </svg>
                 <div className={styles.frameContainer}>
                   <img
                     src={"./assets/backgrounds/class-frame.svg"}
@@ -108,13 +130,10 @@ function Create() {
                     className={styles.frame}
                   />
                 </div>
+              </div>
 
-              </div>
-              
               <div className={styles.name}>{name}</div>
-              <div className={styles.description}>
-                Human
-              </div>
+              <div className={styles.description}>Human</div>
             </div>
           )
         })}
@@ -122,6 +141,9 @@ function Create() {
 
       <div className={styles.bottomLine} />
       {runtimeBodyLoading && <div className={styles.statusMessage}>Loading selected body...</div>}
+      {!runtimeBodyLoading && runtimeBodyError && (
+        <div className={styles.statusMessage}>Unable to render the selected body: {runtimeBodyError}</div>
+      )}
       <div className={styles.buttonContainer}>
         { <CustomButton
           theme="light"

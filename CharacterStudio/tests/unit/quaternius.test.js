@@ -184,4 +184,23 @@ describe('Quaternius and human-male manifest integration', () => {
     expect(manager.avatar.Body.model).toBe(scene)
     expect(manager.avatar.Body.vrm).toBeNull()
   })
+
+  it('should bypass legacy body loads when the runtime body is authoritative', () => {
+    const manager = Object.create(CharacterManager.prototype)
+    manager.avatar = {}
+    manager.runtimeBodyAuthoritative = true
+    manager._modelBaseSetup = vi.fn()
+
+    manager._addLoadedData({
+      collectionID: 'legacy',
+      traitGroupID: 'Body',
+      traitModel: { format: 'gltf', name: 'Legacy Body' },
+      models: [{ scene: {} }],
+      textures: [],
+      colors: [],
+    })
+
+    expect(manager._modelBaseSetup).not.toHaveBeenCalled()
+    expect(manager.avatar.Body).toBeUndefined()
+  })
 })

@@ -8,7 +8,7 @@ export function sceneInitializer(canvasId) {
     const scene = new THREE.Scene()
 
     
-    new RGBELoader().load("./hdr/studio_small_09_2k.hdr", (hdr_) => {
+    new RGBELoader().load(`${import.meta.env.BASE_URL}hdr/studio_small_09_2k.hdr`, (hdr_) => {
         hdr_.mapping = THREE.EquirectangularReflectionMapping;
         hdr_.colorSpace = THREE.LinearSRGBColorSpace
         scene.environment = hdr_;
@@ -49,6 +49,8 @@ export function sceneInitializer(canvasId) {
     });
 
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableRotate = true;
+    controls.enableZoom = true;
     controls.minDistance = 1;
     controls.maxDistance = 4;
     controls.maxPolarAngle = Math.PI / 2;
@@ -76,8 +78,15 @@ export function sceneInitializer(canvasId) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    console.info("[CharacterStudio] Three.js scene initialized", {
+        sceneChildren: scene.children.length,
+        camera: { position: camera.position.toArray(), near: camera.near, far: camera.far },
+        renderer: { width: renderer.domElement.width, height: renderer.domElement.height },
+        lights: scene.children.filter((child) => child.isLight).length,
+    });
 
     const clock = new THREE.Clock();
+    let firstRenderLogged = false;
     const animate = () => {
         requestAnimationFrame(animate);
         const delta = clock.getDelta();
@@ -85,6 +94,22 @@ export function sceneInitializer(canvasId) {
         controls?.update();
         characterManager.update(delta);
         renderer.render(scene, camera);
+        if (!firstRenderLogged) {
+            firstRenderLogged = true;
+            const gl = renderer.getContext();
+            const diagnostics = typeof window !== "undefined"
+                ? (window.__characterStudioDiagnostics ||= { events: [] })
+                : null;
+            const renderEvent = {
+                type: "first-render",
+                sceneChildren: scene.children.length,
+                characterRootAttached: scene.getObjectById(characterManager.rootModel?.id) === characterManager.rootModel,
+                characterModelAttached: scene.getObjectById(characterManager.characterModel?.id) === characterManager.characterModel,
+                webglError: gl.getError(),
+            };
+            console.info("[CharacterStudio] First renderer.render completed", renderEvent);
+            diagnostics?.events.push(renderEvent);
+        }
     };
 
 
@@ -96,12 +121,6 @@ export function sceneInitializer(canvasId) {
         const mousex = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         const mousey = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         characterManager.cameraRaycastCulling(mousex,mousey,isCtrlPressed);
-    };
-
-    const handleWheel = (event) => {
-        if (!event || !characterManager) return;
-        event.preventDefault();
-        updateCharacterVerticalOffset(event.deltaY * -0.0025);
     };
 
     const handleKeyDown = (event) => {
@@ -132,7 +151,6 @@ export function sceneInitializer(canvasId) {
 
     
     canvasRef.addEventListener("click", handleMouseClick);
-    canvasRef.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("keydown", handleKeyDown);
 
     return {

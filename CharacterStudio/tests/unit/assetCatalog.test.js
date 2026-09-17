@@ -3,6 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import {
     AssetCatalog,
+  EDITOR_ASSET_CATEGORIES,
+  getEditorAssetCategory,
+  getEditorAssetSlots,
   getAssetsByCategory,
   isAssetCompatible,
   validateAssetCatalog,
@@ -34,6 +37,39 @@ describe('asset catalog', () => {
       bodyId: 'quaternius.body.superhero-male',
       rig: 'quaternius-standard',
     })).toBe(false)
+  })
+
+  it('maps the Quaternius inventory to editor categories using catalog metadata', () => {
+    expect(EDITOR_ASSET_CATEGORIES.map(({ id }) => id)).toEqual([
+      'body', 'hair', 'head', 'torso', 'arms', 'legs', 'feet',
+      'shoulders', 'weapons', 'equipment', 'outfits',
+    ])
+
+    const editableAssets = catalog.assets.filter((asset) => asset.category !== 'animation')
+    const categoryCounts = editableAssets.reduce((counts, asset) => {
+      const category = getEditorAssetCategory(asset)
+      counts[category] = (counts[category] || 0) + 1
+      return counts
+    }, {})
+
+    expect(categoryCounts).toEqual({
+      body: 2,
+      hair: 8,
+      torso: 4,
+      arms: 4,
+      legs: 4,
+      feet: 4,
+      head: 2,
+      shoulders: 2,
+      outfits: 4,
+      weapons: 18,
+      equipment: 88,
+    })
+    expect(getEditorAssetSlots('shoulders')).toEqual([
+      'clothing-acc-pauldrons',
+      'clothing-acc-pauldron',
+    ])
+    expect(editableAssets.every((asset) => getEditorAssetCategory(asset))).toBe(true)
   })
 
   it('requires attachment metadata for props and rig metadata for animations', () => {
@@ -136,13 +172,14 @@ describe('asset catalog', () => {
     const body = getAssetsByCategory(catalog, 'body')[0]
     const positionState = { x: 0, y: 0, z: 0 }
     const rotationState = { x: 0, y: 0, z: 0 }
+    const child = { visible: false }
     const model = {
       name: 'stale-name',
       parent: null,
       position: { set(x, y, z) { positionState.x = x; positionState.y = y; positionState.z = z } },
       rotation: { set(x, y, z) { rotationState.x = x; rotationState.y = y; rotationState.z = z } },
       scale: { setScalar(value) { this.value = value } },
-      traverse: () => {},
+      traverse: (callback) => callback(child),
     }
     const root = {
       add(model) { model.parent = this },
@@ -160,6 +197,7 @@ describe('asset catalog', () => {
     expect(positionState).toEqual({ x: 0, y: 0, z: 0 })
     expect(rotationState).toEqual({ x: 0, y: 0, z: 0 })
     expect(model.scale.value).toBe(1)
+    expect(child.visible).toBe(true)
   })
 
   it('replaces one assembly slot without disturbing another slot', async () => {
@@ -184,6 +222,59 @@ describe('asset catalog', () => {
     manager.removeAsset('hair')
     expect(manager.getActiveAsset('body').id).toBe(body.id)
     expect(manager.getActiveAsset('hair')).toBeNull()
+  })
+
+  it('rebinds skinned appearance meshes to the body skeleton', async () => {
+    const body = getAssetsByCategory(catalog, 'body')[0]
+    const hair = getAssetsByCategory(catalog, 'hair')[0]
+    const bodyBones = [{ name: 'Head' }]
+    const bodySkeleton = { bones: bodyBones, boneInverses: [{ clone: () => ({}) }] }
+    const bodyMesh = { isSkinnedMesh: true, skeleton: bodySkeleton }
+    const sourceInverse = { source: true }
+    const appearanceMesh = {
+      isSkinnedMesh: true,
+      skeleton: { bones: [{ name: 'Head' }], boneInverses: [{ clone: () => sourceInverse }] },
+      bindMatrix: { clone: () => ({}) },
+      bind(skeleton) { this.skeleton = skeleton },
+    }
+    const root = {
+      add(model) { model.parent = this },
+      remove(model) { if (model.parent === this) model.parent = null },
+      traverse(callback) { callback(bodyMesh) },
+      getObjectByName: () => ({ add(model) { model.parent = this } }),
+    }
+    const model = { parent: null, traverse(callback) { callback(appearanceMesh) } }
+    const manager = new AssetAssemblyManager({
+      root,
+      loader: { loadAsync: async () => ({ scene: model }) },
+    })
+
+    await manager.setAsset('hair', hair, { bodyId: body.id, rig: 'quaternius-standard' })
+
+    expect(appearanceMesh.skeleton.bones[0]).toBe(bodyBones[0])
+    expect(appearanceMesh.skeleton.boneInverses[0]).toBe(sourceInverse)
+  })
+
+  it('clears outfit slots when a modular clothing asset is selected', async () => {
+    const body = getAssetsByCategory(catalog, 'body')[0]
+    const outfit = catalog.assets.find((asset) => asset.slot === 'outfit' && asset.compatibleBodies.includes(body.id))
+    const clothing = catalog.assets.find((asset) => asset.slot === 'clothing-body' && asset.compatibleBodies.includes(body.id))
+    const root = {
+      add(model) { model.parent = this },
+      remove(model) { if (model.parent === this) model.parent = null },
+      traverse: () => {},
+      getObjectByName: () => ({ add(model) { model.parent = this } }),
+    }
+    const manager = new AssetAssemblyManager({
+      root,
+      loader: { loadAsync: async () => ({ scene: { parent: null, traverse: () => {} } }) },
+    })
+
+    await manager.setAsset('body', body, { bodyId: body.id, rig: 'quaternius-standard' })
+    await manager.setAsset('clothing', outfit, { bodyId: body.id, rig: 'quaternius-standard' })
+    await manager.setAsset('clothing', clothing, { bodyId: body.id, rig: 'quaternius-standard' })
+
+    expect(manager.getActiveSlots()).toEqual({ body: body.id, [clothing.slot]: clothing.id })
   })
 
   it('removes models without crashing when a material uses a single texture map object', () => {
@@ -270,6 +361,41 @@ describe('asset catalog', () => {
       ['gltf', '/CharacterStudio/body.glb'],
       ['fbx', '/CharacterStudio/animation.fbx'],
       ['obj', '/CharacterStudio/axe.obj'],
+    ])
+  })
+
+  it('verifies the runtime URL before loading the Quaternius body', async () => {
+    const calls = []
+    const loader = {
+      loadAsync: async (path) => {
+        calls.push(path)
+        return { scene: { traverse: () => {} } }
+      },
+    }
+    const service = new AssetRuntimeLoader({
+      baseURL: '/CharacterStudio/',
+      gltfLoader: loader,
+      fbxLoader: loader,
+      objLoader: loader,
+    })
+    const fetchImplementation = globalThis.fetch
+    globalThis.fetch = async (path, options) => {
+      expect(options).toEqual({ method: 'HEAD' })
+      return { ok: true, status: 200 }
+    }
+
+    try {
+      await service.loadAsync({
+        id: 'quaternius.body.superhero-male',
+        format: 'gltf',
+        path: '/quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody.gltf',
+      })
+    } finally {
+      globalThis.fetch = fetchImplementation
+    }
+
+    expect(calls).toEqual([
+      '/CharacterStudio/quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody.gltf',
     ])
   })
 })

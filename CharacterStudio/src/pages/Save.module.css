@@ -51,7 +51,7 @@
     padding: 8px 170px;
     box-sizing: border-box;
     border-top: 1px solid rgba(180, 202, 235, 0.16);
-    background: linear-gradient(180deg, rgba(8, 14, 21, 0.7), rgba(8, 14, 21, 0.94));
+    background: var(--panel-surface);
     backdrop-filter: blur(16px);
 }
 

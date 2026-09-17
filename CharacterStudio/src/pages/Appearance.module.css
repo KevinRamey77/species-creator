@@ -53,7 +53,7 @@
   text-align: center;
   border: 1px solid rgba(180, 202, 235, 0.26);
   border-radius: 16px;
-  background: rgba(6, 12, 19, 0.72);
+  background: var(--elevated-surface);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(12px);
 }
@@ -140,7 +140,7 @@
   height: -webkit-calc(100vh - 176px);
   height: calc(100vh - 176px);
   backdrop-filter: blur(22.5px);
-  background: rgba(5, 11, 14, 0.8);
+  background: var(--panel-surface);
   z-index: 1000;
   user-select: none;
 }
@@ -161,26 +161,7 @@
   height: calc(100% - 100px);
 }
 .bottomLine {
-  background: rgb(0, 149, 100);
-  background: -moz-linear-gradient(
-    90deg,
-    rgba(0, 149, 100, 0) 0%,
-    rgba(8, 234, 160, 1) 50%,
-    rgba(0, 149, 100, 0) 100%
-  );
-  background: -webkit-linear-gradient(
-    90deg,
-    rgba(0, 149, 100, 0) 0%,
-    rgba(8, 234, 160, 1) 50%,
-    rgba(0, 149, 100, 0) 100%
-  );
-  background: linear-gradient(
-    90deg,
-    rgba(0, 149, 100, 0) 0%,
-    rgba(8, 234, 160, 1) 50%,
-    rgba(0, 149, 100, 0) 100%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#009564",endColorstr="#009564",GradientType=1);
+  background: oklch(0.62 0.17 256);
   position: absolute;
   bottom: 0;
   left: 0;
@@ -254,7 +235,7 @@
 }
 .selectorColorPickerButton{
   backdrop-filter: blur(22.5px);
-  background: rgba(5, 11, 14, 0.8);
+  background: var(--elevated-surface);
   width:40px;
   height: 40px;
   display: flex;
@@ -334,11 +315,10 @@
 .sideMenu,
 .selectorContainerPos {
   box-sizing: border-box;
-  border: 1px solid rgba(180, 202, 235, 0.18);
+  border: 1px solid oklch(1 0 0 / 9%);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(10, 17, 26, 0.94), rgba(6, 11, 17, 0.9));
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(18px);
+  background: oklch(0.198 0.007 265);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
 .sideMenu {
@@ -380,20 +360,24 @@
 
 .editorButton:hover {
   transform: translateY(-2px);
-  border-color: rgba(94, 176, 134, 0.45);
-  background: rgba(94, 176, 134, 0.1);
+  border-color: oklch(0.62 0.17 256 / 45%);
+  background: oklch(0.62 0.17 256 / 10%);
 }
 
-.editorButton:focus-visible,
+.editorButton:focus-visible {
+  outline: 2px solid oklch(0.62 0.17 256);
+  outline-offset: 2px;
+}
+
 .selectorButton:focus-visible {
   outline: 2px solid #8de8b4;
   outline-offset: 2px;
 }
 
 .editorButtonActive {
-  border-color: rgba(94, 176, 134, 0.72);
-  background: linear-gradient(180deg, rgba(94, 176, 134, 0.2), rgba(94, 176, 134, 0.08));
-  box-shadow: inset 0 0 0 1px rgba(141, 232, 180, 0.12);
+  border-color: oklch(0.62 0.17 256 / 72%);
+  background: oklch(0.62 0.17 256 / 16%);
+  box-shadow: inset 0 0 0 1px oklch(0.62 0.17 256 / 20%);
 }
 
 .editorText {
@@ -441,12 +425,12 @@
 
 .selectorButton:hover {
   transform: translateY(-2px);
-  background: rgba(94, 176, 134, 0.1);
+  background: oklch(0.62 0.17 256 / 10%);
 }
 
 .selectorButtonActive {
-  background: rgba(94, 176, 134, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(141, 232, 180, 0.2);
+  background: oklch(0.62 0.17 256 / 16%);
+  box-shadow: inset 0 0 0 1px oklch(0.62 0.17 256 / 20%);
 }
 
 .selectorPickerTabs {
@@ -454,7 +438,7 @@
   top: 18px;
   padding: 4px;
   border-radius: 0 10px 10px 0;
-  background: rgba(6, 11, 17, 0.9);
+  background: var(--elevated-surface);
 }
 
 .selectorColorPickerButton {
@@ -478,17 +462,17 @@
 .uploadButton {
   width: 100%;
   height: 32px;
-  border: 1px solid rgba(94, 176, 134, 0.45);
+  border: 1px solid oklch(0.62 0.17 256 / 55%);
   outline: 0;
   border-radius: 8px;
-  background: rgba(94, 176, 134, 0.12);
-  color: #baf2d1;
+  background: oklch(0.62 0.17 256 / 16%);
+  color: oklch(0.96 0.003 265);
   transition: background 160ms ease, border-color 160ms ease;
 }
 
 .uploadButton:hover {
-  border-color: rgba(94, 176, 134, 0.8);
-  background: rgba(94, 176, 134, 0.2);
+  border-color: oklch(0.62 0.17 256 / 45%);
+  background: oklch(0.62 0.17 256 / 10%);
 }
 
 @media (max-width: 900px) {
@@ -544,7 +528,7 @@
   --ink: #f3f0e8;
   --muted: #a5a49d;
   --line: rgba(243, 240, 232, 0.14);
-  --panel: rgba(20, 25, 26, 0.88);
+  --panel: var(--panel-surface);
   --lime: #d2ef76;
   position: relative;
   z-index: 2;

@@ -40,6 +40,15 @@
   src: url("./fonts/tt-squares/TT Squares Condensed Thin.otf");
 }
 
+:root {
+  --app-background: oklch(0.16 0.006 265);
+  --panel-surface: oklch(0.198 0.007 265);
+  --elevated-surface: oklch(0.21 0.008 265);
+  --secondary-control-surface: oklch(0.25 0.008 265);
+  --muted-surface: oklch(0.24 0.007 265);
+  --accent-surface: oklch(0.27 0.01 265);
+}
+
 html,
 body {
   margin: 0;
@@ -48,9 +57,7 @@ body {
   height: 100%;
   overflow: hidden;
   font-family: "TTSC-Regular";
-  background:
-    radial-gradient(circle at top, rgba(72, 98, 148, 0.38), transparent 32%),
-    linear-gradient(180deg, #090d14 0%, #101821 45%, #0a1118 100%);
+  background: var(--app-background);
   color: #edf3ff;
 }
 

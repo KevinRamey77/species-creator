@@ -10,13 +10,62 @@ import {
   isAssetCompatible,
   validateAssetCatalog,
 } from '../../src/library/assetCatalog'
-import { AssetAssemblyManager } from '../../src/library/assetAssemblyManager'
+import {
+  AssetAssemblyManager,
+  prepareSkinnedMeshInfluences,
+} from '../../src/library/assetAssemblyManager'
 import { AssetRuntimeLoader } from '../../src/library/assetRuntimeLoader'
 import { SceneContext } from '../../src/context/SceneContext'
 import CatalogAssetPanel from '../../src/components/CatalogAssetPanel'
 import catalog from '../../public/quaternius/catalog.json'
+import * as THREE from 'three'
 
 describe('asset catalog', () => {
+  it('keeps the four strongest skin influences and normalizes their weights', () => {
+    const geometry = new THREE.BufferGeometry()
+    const skinIndex = new THREE.Uint16BufferAttribute([1, 2, 3, 4], 4)
+    const skinWeight = new THREE.Float32BufferAttribute([0.6, 0.5, 0.1, 0.05], 4)
+    const secondaryIndex = new THREE.Uint8BufferAttribute([5, 6, 7, 8], 4)
+    const secondaryWeight = new THREE.Float32BufferAttribute([0.4, 0.3, 0.2, 0.1], 4)
+    geometry.setAttribute('skinIndex', skinIndex)
+    geometry.setAttribute('skinWeight', skinWeight)
+    geometry.setAttribute('joints_1', secondaryIndex)
+    geometry.setAttribute('weights_1', secondaryWeight)
+
+    expect(prepareSkinnedMeshInfluences({ geometry })).toBe(true)
+    expect([...skinIndex.array]).toEqual([1, 2, 5, 6])
+    expect(skinWeight.getX(0)).toBeCloseTo(0.6 / 1.8)
+    expect(skinWeight.getY(0)).toBeCloseTo(0.5 / 1.8)
+    expect(skinWeight.getZ(0)).toBeCloseTo(0.4 / 1.8)
+    expect(skinWeight.getW(0)).toBeCloseTo(0.3 / 1.8)
+    expect(skinWeight.getX(0) + skinWeight.getY(0) + skinWeight.getZ(0) + skinWeight.getW(0)).toBeCloseTo(1)
+  })
+
+  it('leaves single-set skinning unchanged and handles zero secondary weights', () => {
+    const unchanged = new THREE.BufferGeometry()
+    const unchangedIndex = new THREE.Uint16BufferAttribute([1, 2, 3, 4], 4)
+    const unchangedWeight = new THREE.Float32BufferAttribute([0.1, 0.2, 0.3, 0.4], 4)
+    unchanged.setAttribute('skinIndex', unchangedIndex)
+    unchanged.setAttribute('skinWeight', unchangedWeight)
+    expect(prepareSkinnedMeshInfluences({ geometry: unchanged })).toBe(false)
+    expect([...unchangedIndex.array]).toEqual([1, 2, 3, 4])
+    expect(unchangedWeight.getX(0)).toBeCloseTo(0.1)
+    expect(unchangedWeight.getY(0)).toBeCloseTo(0.2)
+    expect(unchangedWeight.getZ(0)).toBeCloseTo(0.3)
+    expect(unchangedWeight.getW(0)).toBeCloseTo(0.4)
+
+    const zero = new THREE.BufferGeometry()
+    const zeroIndex = new THREE.Uint16BufferAttribute([1, 2, 3, 4], 4)
+    const zeroWeight = new THREE.Float32BufferAttribute([0, 0, 0, 0], 4)
+    zero.setAttribute('skinIndex', zeroIndex)
+    zero.setAttribute('skinWeight', zeroWeight)
+    zero.setAttribute('joints_1', new THREE.Uint8BufferAttribute([5, 6, 7, 8], 4))
+    zero.setAttribute('weights_1', new THREE.Float32BufferAttribute([0, 0, 0, 0], 4))
+    expect(prepareSkinnedMeshInfluences({ geometry: zero })).toBe(true)
+    expect([...zeroWeight.array]).toEqual([0, 0, 0, 0])
+    expect([...zeroWeight.array].every(Number.isFinite)).toBe(true)
+  })
+
   it('accepts the initial Quaternius source inventory', () => {
     expect(validateAssetCatalog(catalog)).toEqual([])
     expect(getAssetsByCategory(catalog, 'body')).toHaveLength(2)
@@ -224,18 +273,29 @@ describe('asset catalog', () => {
     expect(manager.getActiveAsset('hair')).toBeNull()
   })
 
-  it('rebinds skinned appearance meshes to the body skeleton', async () => {
+  it('retargets skinned appearance poses without replacing their bind skeleton', async () => {
     const body = getAssetsByCategory(catalog, 'body')[0]
     const hair = getAssetsByCategory(catalog, 'hair')[0]
-    const bodyBones = [{ name: 'Head' }]
+    const bodyBone = new THREE.Bone()
+    bodyBone.name = 'Head'
+    bodyBone.rotation.z = Math.PI / 2
+    bodyBone.updateMatrix()
+    const bodyBones = [bodyBone]
     const bodySkeleton = { bones: bodyBones, boneInverses: [{ clone: () => ({}) }] }
     const bodyMesh = { isSkinnedMesh: true, skeleton: bodySkeleton }
-    const sourceInverse = { source: true }
+    const appearanceBone = new THREE.Bone()
+    appearanceBone.name = 'Head'
+    appearanceBone.position.y = 1
+    appearanceBone.rotation.z = Math.PI / 4
+    appearanceBone.updateMatrix()
+    const appearanceSkeleton = {
+      bones: [appearanceBone],
+      boneInverses: [{ clone: () => ({ source: true }) }],
+    }
     const appearanceMesh = {
       isSkinnedMesh: true,
-      skeleton: { bones: [{ name: 'Head' }], boneInverses: [{ clone: () => sourceInverse }] },
+      skeleton: appearanceSkeleton,
       bindMatrix: { clone: () => ({}) },
-      bind(skeleton) { this.skeleton = skeleton },
     }
     const root = {
       add(model) { model.parent = this },
@@ -243,16 +303,104 @@ describe('asset catalog', () => {
       traverse(callback) { callback(bodyMesh) },
       getObjectByName: () => ({ add(model) { model.parent = this } }),
     }
+    const bodyModel = { parent: null, traverse(callback) { callback(bodyMesh) } }
     const model = { parent: null, traverse(callback) { callback(appearanceMesh) } }
     const manager = new AssetAssemblyManager({
       root,
-      loader: { loadAsync: async () => ({ scene: model }) },
+      loader: { loadAsync: async (asset) => ({ scene: asset.category === 'body' ? bodyModel : model }) },
     })
 
+    bodyBone.rotation.z = Math.PI / 2
+    bodyBone.updateMatrix()
+    await manager.setAsset('body', body, { bodyId: body.id, rig: 'quaternius-standard' })
+    bodyBone.rotation.z = Math.PI
+    bodyBone.updateMatrix()
+    await manager.setAsset('hair', hair, { bodyId: body.id, rig: 'quaternius-standard' })
+    bodyBone.position.y = 2
+    bodyBone.rotation.z = Math.PI
+    bodyBone.updateMatrix()
+    manager.update(0)
+
+    expect(appearanceMesh.skeleton).toBe(appearanceSkeleton)
+    expect(appearanceBone.position.x).toBeCloseTo(0)
+    expect(appearanceBone.position.y).toBeCloseTo(1)
+  })
+
+  it('retargets every appearance mesh through its own bind data', async () => {
+    const body = getAssetsByCategory(catalog, 'body')[0]
+    const hair = getAssetsByCategory(catalog, 'hair')[0]
+    const makeGeometry = () => {
+      const geometry = new THREE.BufferGeometry()
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3))
+      geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute([0, 0, 0, 0], 4))
+      geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute([1, 0, 0, 0], 4))
+      return geometry
+    }
+    const makeSkinnedMesh = (bone, bindMatrix) => {
+      const skeleton = new THREE.Skeleton([bone])
+      const mesh = new THREE.SkinnedMesh(makeGeometry(), new THREE.MeshBasicMaterial())
+      mesh.bind(skeleton, bindMatrix)
+      return { mesh, skeleton }
+    }
+
+    const bodyModel = new THREE.Group()
+    const bodyParent = new THREE.Bone()
+    bodyParent.name = 'BodyRoot'
+    bodyParent.position.y = 2
+    const bodyBone = new THREE.Bone()
+    bodyBone.name = 'Head'
+    bodyBone.position.y = 1
+    bodyParent.add(bodyBone)
+    bodyModel.add(bodyParent)
+    const bodyPart = makeSkinnedMesh(bodyBone, new THREE.Matrix4().makeTranslation(0, 0, 1))
+    bodyModel.add(bodyPart.mesh)
+    bodyModel.updateMatrixWorld(true)
+
+    const appearanceModel = new THREE.Group()
+    const appearanceParts = [1, 2].map((scale) => {
+      const parent = new THREE.Bone()
+      parent.name = `AppearanceRoot${scale}`
+      parent.position.x = scale
+      const bone = new THREE.Bone()
+      bone.name = 'Head'
+      bone.position.y = scale
+      parent.add(bone)
+      appearanceModel.add(parent)
+      const part = makeSkinnedMesh(bone, new THREE.Matrix4().makeScale(scale, scale, scale))
+      appearanceModel.add(part.mesh)
+      return { ...part, bone, restWorld: bone.matrixWorld.clone(), bindMatrix: part.mesh.bindMatrix.clone() }
+    })
+    appearanceModel.updateMatrixWorld(true)
+    appearanceParts.forEach((part) => { part.restWorld = part.bone.matrixWorld.clone() })
+
+    const root = new THREE.Group()
+    const manager = new AssetAssemblyManager({
+      root,
+      loader: {
+        loadAsync: async (asset) => ({ scene: asset.category === 'body' ? bodyModel : appearanceModel }),
+      },
+    })
+
+    await manager.setAsset('body', body, { bodyId: body.id, rig: 'quaternius-standard' })
     await manager.setAsset('hair', hair, { bodyId: body.id, rig: 'quaternius-standard' })
 
-    expect(appearanceMesh.skeleton.bones[0]).toBe(bodyBones[0])
-    expect(appearanceMesh.skeleton.boneInverses[0]).toBe(sourceInverse)
+    const bodyRestWorld = bodyBone.matrixWorld.clone()
+    bodyBone.rotation.z = Math.PI / 2
+    bodyModel.updateMatrixWorld(true)
+    const bodyCurrentWorld = bodyBone.matrixWorld.clone()
+    manager.update(0)
+
+    appearanceParts.forEach(({ mesh, skeleton, bone, restWorld, bindMatrix }) => {
+      const expectedWorld = bodyCurrentWorld.clone()
+        .multiply(bodyRestWorld.clone().invert())
+        .multiply(restWorld)
+      bone.matrixWorld.elements.forEach((value, index) => {
+        expect(value, `matrix element ${index}`).toBeCloseTo(expectedWorld.elements[index])
+      })
+      expect(mesh.skeleton).toBe(skeleton)
+      expect(mesh.bindMatrix).toEqual(bindMatrix)
+      expect(skeleton.boneInverses[0].elements.every(Number.isFinite)).toBe(true)
+    })
   })
 
   it('clears outfit slots when a modular clothing asset is selected', async () => {

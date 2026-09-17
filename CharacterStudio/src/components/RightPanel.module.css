@@ -10,7 +10,7 @@
   box-sizing: border-box;
   border: 1px solid rgba(180, 202, 235, 0.18);
   border-radius: 16px;
-  background: rgba(6, 11, 17, 0.9);
+  background: var(--panel-surface);
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
   z-index: 1000;
   user-select: none;

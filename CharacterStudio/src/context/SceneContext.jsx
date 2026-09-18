@@ -56,6 +56,7 @@ export const SceneProvider = (props) => {
   const [manifest, setManifest] = useState(null)
   const [debugMode, setDebugMode] = useState(false);
   const initRef = React.useRef(false)
+  const isolatedClothingRef = React.useRef(false)
 
   useEffect(() => {
     const catalogURL = `${import.meta.env.BASE_URL}quaternius/runtime-catalog.json`
@@ -216,6 +217,36 @@ export const SceneProvider = (props) => {
         distance,
       })
     }
+
+  useEffect(() => {
+    if (isolatedClothingRef.current || !scene || !camera || !controls || !assetCatalog.isLoaded()) return
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has("DEBUG_ISOLATED_CLOTHING")) return
+
+    const isolatedAsset = assetCatalog.getById("quaternius.clothing.male-ranger-feet-boots")
+    if (!isolatedAsset) return
+    isolatedClothingRef.current = true
+
+    assetRuntimeLoader.loadAsync(isolatedAsset).then((loaded) => {
+      const model = loaded.scene || loaded
+      scene.add(model)
+      model.updateMatrixWorld(true)
+      const bounds = new THREE.Box3().setFromObject(model)
+      console.info("[CharacterStudio] ISOLATED CLOTHING SCENE — NO BODY, NO ASSEMBLY, NO RETARGETING", {
+        id: isolatedAsset.id,
+        parent: model.parent?.name || null,
+        bounds: {
+          min: bounds.min.toArray(),
+          max: bounds.max.toArray(),
+          size: bounds.getSize(new THREE.Vector3()).toArray(),
+        },
+      })
+      frameRuntimeBody(model)
+    }).catch((error) => {
+      console.error("[CharacterStudio] Isolated clothing load failed", error)
+      isolatedClothingRef.current = false
+    })
+  }, [assetCatalog, assetRuntimeLoader, camera, controls, scene])
 
   const selectRuntimeBody = async (bodyId) => {
     setRuntimeBodyLoading(true)

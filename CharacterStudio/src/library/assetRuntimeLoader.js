@@ -4,6 +4,61 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 const SUPPORTED_FORMATS = new Set(["fbx", "glb", "gltf", "obj"]);
 
+const describeObject = (object) => ({
+  name: object.name || null,
+  type: object.type || null,
+  isSkinnedMesh: !!object.isSkinnedMesh,
+  position: object.position?.toArray?.() || null,
+  quaternion: object.quaternion?.toArray?.() || null,
+  rotation: object.rotation?.toArray?.() || null,
+  scale: object.scale?.toArray?.() || null,
+  matrix: object.matrix?.elements?.slice() || null,
+  matrixWorld: object.matrixWorld?.elements?.slice() || null,
+  parent: object.parent?.name || null,
+  children: object.children?.map((child) => child.name || child.type) || [],
+  bindMode: object.bindMode || null,
+  bindMatrix: object.bindMatrix?.elements?.slice() || null,
+  bindMatrixInverse: object.bindMatrixInverse?.elements?.slice() || null,
+  skeleton: object.skeleton ? {
+    uuid: object.skeleton.uuid,
+    boneCount: object.skeleton.bones.length,
+    root: object.skeleton.bones[0]?.name || null,
+    bones: object.skeleton.bones.map((bone) => ({
+      name: bone.name,
+      uuid: bone.uuid,
+      position: bone.position.toArray(),
+      quaternion: bone.quaternion.toArray(),
+      rotation: bone.rotation.toArray(),
+      scale: bone.scale.toArray(),
+      matrix: bone.matrix.elements.slice(),
+      matrixWorld: bone.matrixWorld.elements.slice(),
+      parent: bone.parent?.name || null,
+    })),
+    boneInverses: object.skeleton.boneInverses.map((inverse) => inverse.elements.slice()),
+  } : null,
+  geometry: object.geometry ? {
+    attributes: Object.fromEntries(Object.entries(object.geometry.attributes).map(([name, attribute]) => [name, {
+      itemSize: attribute.itemSize,
+      count: attribute.count,
+      array: Array.from(attribute.array),
+    }])),
+    boundingBox: object.geometry.boundingBox ? {
+      min: object.geometry.boundingBox.min.toArray(),
+      max: object.geometry.boundingBox.max.toArray(),
+    } : null,
+    boundingSphere: object.geometry.boundingSphere ? {
+      center: object.geometry.boundingSphere.center.toArray(),
+      radius: object.geometry.boundingSphere.radius,
+    } : null,
+  } : null,
+});
+
+const describeHierarchy = (root) => {
+  const hierarchy = [];
+  root?.traverse?.((object) => hierarchy.push(describeObject(object)));
+  return hierarchy;
+};
+
 export class AssetRuntimeLoader {
   constructor({ gltfLoader = new GLTFLoader(), fbxLoader = new FBXLoader(), objLoader = new OBJLoader(), baseURL = "/" } = {}) {
     this.loaders = {
@@ -65,6 +120,14 @@ export class AssetRuntimeLoader {
           hasScene: !!loaded?.scene,
           meshCount,
         });
+        if (typeof window !== "undefined"
+          && new URLSearchParams(window.location.search).has("DEBUG_GLTF_HIERARCHY")
+          && asset.format === "gltf") {
+          console.info("[CharacterStudio] GLTF hierarchy immediately after loader", {
+            id: asset.id,
+            hierarchy: describeHierarchy(model),
+          });
+        }
         diagnostics?.events.push({ type: "asset-loaded", id: asset.id, hasScene: !!loaded?.scene, meshCount });
         return loaded;
       })

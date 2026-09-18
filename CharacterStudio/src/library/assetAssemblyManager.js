@@ -183,12 +183,64 @@ const describeRuntimeMeshes = (root) => {
   return meshes;
 };
 
+const logClothingBoundary = (label, asset, model, manager = null) => {
+  if (asset?.category !== "clothing") return;
+  const poseBindingExists = !![...(manager?.poseBindings?.values?.() || [])]
+    .find((poseBinding) => poseBinding.model === model);
+  const event = {
+    checkpoint: label,
+    asset: asset.id,
+    parent: model?.parent?.name || null,
+    position: model?.position?.toArray?.() || null,
+    scale: model?.scale?.toArray?.() || null,
+    poseBindingExists,
+  };
+  console.info(`[CharacterStudio] ${label}`, {
+    function: "AssetAssemblyManager.setAsset",
+    ...event,
+    modelQuaternion: model?.quaternion?.toArray?.() || null,
+    modelMatrix: model?.matrix?.elements?.slice() || null,
+    modelMatrixWorld: model?.matrixWorld?.elements?.slice() || null,
+    meshes: describeRuntimeMeshes(model),
+  });
+  if (typeof window !== "undefined"
+    && new URLSearchParams(window.location.search).get("DEBUG_CLOTHING_TRACE")?.toLowerCase() === "true") {
+    const trace = window.__characterStudioClothingTrace ||= { events: [] };
+    trace.events.push(event);
+    window.dispatchEvent(new CustomEvent("characterStudio-clothing-trace", { detail: event }));
+  }
+};
+
 const getBodySkeleton = (root) => {
   const bodyMesh = findSkinnedMesh(root);
   return bodyMesh?.skeleton || null;
 };
 
-const createPoseBinding = (model, bodySkeleton, bodyRestMatrices) => {
+const describeSkeletonBinding = (mesh) => ({
+  mesh: mesh?.name || null,
+  skeletonUUID: mesh?.skeleton?.uuid || null,
+  rootBoneUUID: mesh?.skeleton?.bones?.[0]?.uuid || null,
+  boneCount: mesh?.skeleton?.bones?.length || 0,
+  boneNames: mesh?.skeleton?.bones?.map((bone) => bone.name) || [],
+  firstBoneNames: mesh?.skeleton?.bones?.slice(0, 8).map((bone) => bone.name) || [],
+  bindMatrix: mesh?.bindMatrix?.elements?.slice() || null,
+  bindMatrixInverse: mesh?.bindMatrixInverse?.elements?.slice() || null,
+  boneInverses: mesh?.skeleton?.boneInverses?.map((inverse) => inverse?.elements?.slice?.() || null) || [],
+  skinIndex: mesh?.geometry?.getAttribute?.("skinIndex") ? {
+    itemSize: mesh.geometry.getAttribute("skinIndex").itemSize,
+    count: mesh.geometry.getAttribute("skinIndex").count,
+    array: Array.from(mesh.geometry.getAttribute("skinIndex").array),
+  } : null,
+  skinWeight: mesh?.geometry?.getAttribute?.("skinWeight") ? {
+    itemSize: mesh.geometry.getAttribute("skinWeight").itemSize,
+    count: mesh.geometry.getAttribute("skinWeight").count,
+    array: Array.from(mesh.geometry.getAttribute("skinWeight").array),
+  } : null,
+});
+
+const getWorldMatrix = (object) => object?.matrixWorld?.clone?.() || new THREE.Matrix4();
+
+const createPoseBinding = (model, bodySkeleton, bodyRestMatrices, assemblyRoot) => {
   const appearanceMeshes = findSkinnedMeshes(model);
   if (appearanceMeshes.length === 0 || !bodySkeleton) return null;
 
@@ -208,7 +260,7 @@ const createPoseBinding = (model, bodySkeleton, bodyRestMatrices) => {
       bindings.push({
         appearanceBone,
         bodyBone,
-        appearanceRestWorld: appearanceBone.matrixWorld.clone(),
+        appearanceRestRoot: getWorldMatrix(assemblyRoot).invert().multiply(appearanceBone.matrixWorld),
         inverseBodyRestWorld: bodyRestMatrices.get(bodyBone.name.toLowerCase())?.clone()
           ?.invert() || bodyBone.matrixWorld.clone().invert(),
         targetWorld: new THREE.Matrix4(),
@@ -217,7 +269,7 @@ const createPoseBinding = (model, bodySkeleton, bodyRestMatrices) => {
     });
   });
 
-  return { bindings, skeletons: [...skeletons] };
+  return { bindings, skeletons: [...skeletons], assemblyRoot, model };
 };
 
 const getBoneDepth = (bone) => {
@@ -229,13 +281,18 @@ const getBoneDepth = (bone) => {
 const syncPoseBinding = (poseBinding) => {
   if (!poseBinding) return;
 
+  const rootWorld = poseBinding.assemblyRoot.matrixWorld || new THREE.Matrix4();
+  const rootWorldInverse = rootWorld.clone().invert();
   poseBinding.bindings
     .slice()
     .sort((left, right) => getBoneDepth(left.appearanceBone) - getBoneDepth(right.appearanceBone))
-    .forEach(({ appearanceBone, bodyBone, appearanceRestWorld, inverseBodyRestWorld, targetWorld, parentWorldInverse }) => {
+    .forEach(({ appearanceBone, bodyBone, appearanceRestRoot, inverseBodyRestWorld, targetWorld, parentWorldInverse }) => {
       bodyBone.updateMatrixWorld(true);
-      targetWorld.multiplyMatrices(bodyBone.matrixWorld, inverseBodyRestWorld)
-        .multiply(appearanceRestWorld);
+      const bodyCurrentRoot = rootWorldInverse.clone().multiply(bodyBone.matrixWorld);
+      const targetRoot = bodyCurrentRoot
+        .multiply(inverseBodyRestWorld)
+        .multiply(appearanceRestRoot);
+      targetWorld.multiplyMatrices(rootWorld, targetRoot);
 
       if (appearanceBone.parent) {
         appearanceBone.parent.updateMatrixWorld(true);
@@ -265,6 +322,27 @@ export class AssetAssemblyManager {
     this.bodyRestMatrices = new Map();
     this.poseBindings = new Map();
     this.bodyDepthWriteState = null;
+    this.diagnosticCheckpointHandler = null;
+    this.diagnosticPoseSyncPending = null;
+    this.diagnosticPoseSyncAfterPending = null;
+    this.diagnosticPoseSyncReady = false;
+    this.diagnosticPoseSyncAfterReady = false;
+    this.loggedPoseSyncBindings = new WeakSet();
+    this.disableClothingPoseSync = typeof window !== "undefined"
+      && new URLSearchParams(window.location.search).has("DEBUG_DISABLE_CLOTHING_POSE_SYNC");
+  }
+
+  setDiagnosticCheckpointHandler(handler = null) {
+    this.diagnosticCheckpointHandler = typeof handler === "function" ? handler : null;
+    this.diagnosticPoseSyncPending = null;
+    this.diagnosticPoseSyncAfterPending = null;
+    this.diagnosticPoseSyncReady = false;
+    this.diagnosticPoseSyncAfterReady = false;
+  }
+
+  async waitForDiagnosticCheckpoint(name, context) {
+    if (!this.diagnosticCheckpointHandler || context?.asset?.category !== "clothing") return;
+    await this.diagnosticCheckpointHandler(name, context);
   }
 
   registerSlot(slot) {
@@ -328,10 +406,22 @@ export class AssetAssemblyManager {
     }
     const loaded = await this.loader.loadAsync(asset);
     const model = loaded.scene || loaded;
+    logClothingBoundary("clothing loaded", asset, model, this);
+    await this.waitForDiagnosticCheckpoint("clothing-loaded", { asset, model, manager: this });
+    const loadedClothingMeshes = asset.category === "clothing" ? findSkinnedMeshes(model) : [];
+    if (this.disableClothingPoseSync && loadedClothingMeshes.length > 0) {
+      console.info("[CharacterStudio] CLOTHING POSE SYNC DISABLED — ORIGINAL GLTF SKELETON UNTOUCHED", {
+        id: asset.id,
+        meshes: loadedClothingMeshes.map(describeSkeletonBinding),
+      });
+    }
+    logClothingBoundary("before clothing processing", asset, model, this);
     model.traverse?.((child) => {
       child.visible = true;
       if (child.isSkinnedMesh) {
-        prepareSkinnedMeshInfluences(child);
+        if (!(this.disableClothingPoseSync && asset.category === "clothing")) {
+          prepareSkinnedMeshInfluences(child);
+        }
         child.frustumCulled = false;
       }
     });
@@ -341,9 +431,15 @@ export class AssetAssemblyManager {
     model.rotation?.set?.(0, 0, 0);
     model.scale?.setScalar?.(1);
 
+    await this.waitForDiagnosticCheckpoint("after-clothing-processing", { asset, model, manager: this });
+    logClothingBoundary("after clothing processing", asset, model, this);
+
     if (model.parent) {
       model.parent.remove(model);
     }
+
+    await this.waitForDiagnosticCheckpoint("after-model-root-operations", { asset, model, manager: this });
+    logClothingBoundary("before clothing attachment", asset, model, this);
 
     if (targetSlot === "body" && this.getActiveAsset("body")?.id !== asset.id) {
       this.animationMixer?.stopAllAction();
@@ -371,20 +467,6 @@ export class AssetAssemblyManager {
       this.poseBindings.delete(targetSlot);
     }
 
-    model.updateMatrixWorld?.(true);
-    if (targetSlot === "body") {
-      this.bodySkeleton = getBodySkeleton(model);
-      this.bodyDepthWriteState = captureBodyDepthWriteState(model);
-      this.bodyRestMatrices = new Map(
-        this.bodySkeleton?.bones.map((bone) => [bone.name.toLowerCase(), bone.matrixWorld.clone()]) || [],
-      );
-    } else if (this.bodySkeleton && findSkinnedMeshes(model).length > 0) {
-      this.poseBindings.set(
-        targetSlot,
-        createPoseBinding(model, this.bodySkeleton, this.bodyRestMatrices),
-      );
-    }
-
     if (asset.attachmentBone && targetSlot !== "body" && !findSkinnedMesh(model)) {
       const attachmentTarget = findAttachmentTarget(this.root, asset.attachmentBone);
       if (!attachmentTarget) {
@@ -395,16 +477,49 @@ export class AssetAssemblyManager {
     } else {
       this.root.add(model);
     }
+    logClothingBoundary("after clothing attachment", asset, model, this);
+
+    await this.waitForDiagnosticCheckpoint("after-attachment", { asset, model, manager: this });
 
     model.updateMatrixWorld?.(true);
+    if (targetSlot === "body") {
+      this.bodySkeleton = getBodySkeleton(model);
+      this.bodyDepthWriteState = captureBodyDepthWriteState(model);
+      const rootWorldInverse = getWorldMatrix(this.root).invert();
+      this.bodyRestMatrices = new Map(
+        this.bodySkeleton?.bones.map((bone) => [
+          bone.name.toLowerCase(),
+          rootWorldInverse.clone().multiply(bone.matrixWorld),
+        ]) || [],
+      );
+      console.info("[CharacterStudio] Body skeleton binding", describeSkeletonBinding(findSkinnedMesh(model)));
+    } else if (this.bodySkeleton && findSkinnedMeshes(model).length > 0 && !this.disableClothingPoseSync) {
+      this.poseBindings.set(
+        targetSlot,
+        createPoseBinding(model, this.bodySkeleton, this.bodyRestMatrices, this.root),
+      );
+      logClothingBoundary("after pose-binding creation", asset, model, this);
+      await this.waitForDiagnosticCheckpoint("after-pose-binding-creation", { asset, model, manager: this });
+    }
     model.traverse?.((child) => {
       if (!child.isSkinnedMesh || !child.skeleton) return;
       const hasMatrixWorld = child.skeleton.bones?.every((bone) => bone.matrixWorld?.elements);
-      if (hasMatrixWorld) child.skeleton.update?.();
+        if (hasMatrixWorld && !(this.disableClothingPoseSync && targetSlot !== "body")) {
+          child.skeleton.update?.();
+        }
       child.computeBoundingBox?.();
       child.computeBoundingSphere?.();
     });
+    logClothingBoundary("after skeleton processing", asset, model, this);
+    await this.waitForDiagnosticCheckpoint("after-skeleton-processing", { asset, model, manager: this });
     this.root.updateMatrixWorld?.(true);
+    if (targetSlot !== "body" && findSkinnedMeshes(model).length > 0) {
+      console.info("[CharacterStudio] Clothing skeleton binding", {
+        id: asset.id,
+        poseSyncDisabled: this.disableClothingPoseSync,
+        meshes: findSkinnedMeshes(model).map(describeSkeletonBinding),
+      });
+    }
 
     this.activeAssets.set(targetSlot, { asset, model });
   if (targetSlot !== "body") setBodyDepthWrite(this.bodyDepthWriteState, false);
@@ -436,6 +551,8 @@ export class AssetAssemblyManager {
     };
     console.info("[CharacterStudio] Runtime asset attached", assemblyEvent);
     diagnostics?.events.push(assemblyEvent);
+    logClothingBoundary("after final assembly", asset, model, this);
+    await this.waitForDiagnosticCheckpoint("after-final-assembly", { asset, model, manager: this });
     return model;
   }
 
@@ -461,7 +578,49 @@ export class AssetAssemblyManager {
 
   update(deltaTime) {
     this.animationMixer?.update(deltaTime);
-    this.poseBindings.forEach(syncPoseBinding);
+    if (!this.disableClothingPoseSync) {
+      if (this.diagnosticCheckpointHandler && this.poseBindings.size > 0) {
+        if (!this.diagnosticPoseSyncReady) {
+          if (!this.diagnosticPoseSyncPending) {
+            const entry = [...this.activeAssets.values()].find(({ asset }) => asset?.category === "clothing");
+            this.diagnosticPoseSyncPending = this.waitForDiagnosticCheckpoint(
+              "before-pose-sync",
+              { asset: entry?.asset, model: entry?.model, manager: this },
+            ).then(() => {
+              this.diagnosticPoseSyncReady = true;
+              this.diagnosticPoseSyncPending = null;
+            });
+          }
+          return;
+        }
+        if (!this.diagnosticPoseSyncAfterReady) {
+          syncPoseBinding([...this.poseBindings.values()][0]);
+          if (!this.diagnosticPoseSyncAfterPending) {
+            const entry = [...this.activeAssets.values()].find(({ asset }) => asset?.category === "clothing");
+            this.diagnosticPoseSyncAfterPending = this.waitForDiagnosticCheckpoint(
+              "after-pose-sync",
+              { asset: entry?.asset, model: entry?.model, manager: this },
+            ).then(() => {
+              this.diagnosticPoseSyncAfterReady = true;
+              this.diagnosticPoseSyncAfterPending = null;
+            });
+          }
+          return;
+        }
+      }
+      this.poseBindings.forEach((poseBinding) => {
+        if (!this.loggedPoseSyncBindings.has(poseBinding)) {
+          const model = poseBinding.model;
+          const asset = [...this.activeAssets.values()].find((entry) => entry.model === model)?.asset;
+          logClothingBoundary("before clothing pose synchronization", asset, model, this);
+          syncPoseBinding(poseBinding);
+          logClothingBoundary("after clothing pose synchronization", asset, model, this);
+          this.loggedPoseSyncBindings.add(poseBinding);
+          return;
+        }
+        syncPoseBinding(poseBinding);
+      });
+    }
   }
 
   removeAsset(slot) {
@@ -492,6 +651,7 @@ export class AssetAssemblyManager {
     this.bodySkeleton = null;
     this.bodyRestMatrices.clear();
     this.poseBindings.clear();
+    this.setDiagnosticCheckpointHandler(null);
     restoreBodyDepthWrite(this.bodyDepthWriteState);
     this.bodyDepthWriteState = null;
     [...this.activeAssets.keys()].forEach((slot) => this.removeAsset(slot));

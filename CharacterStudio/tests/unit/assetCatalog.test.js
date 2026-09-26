@@ -5,7 +5,9 @@ import {
     AssetCatalog,
   EDITOR_ASSET_CATEGORIES,
   getEditorAssetCategory,
+  getEditorAssetOptions,
   getEditorAssetSlots,
+  updateSelectedRuntimeAssets,
   getAssetsByCategory,
   isAssetCompatible,
   validateAssetCatalog,
@@ -90,8 +92,8 @@ describe('asset catalog', () => {
 
   it('maps the Quaternius inventory to editor categories using catalog metadata', () => {
     expect(EDITOR_ASSET_CATEGORIES.map(({ id }) => id)).toEqual([
-      'body', 'hair', 'head', 'torso', 'arms', 'legs', 'feet',
-      'shoulders', 'weapons', 'equipment', 'outfits',
+      'body', 'hair', 'outfits', 'tops', 'head', 'legs', 'feet',
+      'armor', 'weapons', 'equipment',
     ])
 
     const editableAssets = catalog.assets.filter((asset) => asset.category !== 'animation')
@@ -104,21 +106,53 @@ describe('asset catalog', () => {
     expect(categoryCounts).toEqual({
       body: 2,
       hair: 8,
-      torso: 4,
-      arms: 4,
+      tops: 8,
       legs: 4,
       feet: 4,
       head: 2,
-      shoulders: 2,
+      armor: 2,
       outfits: 4,
       weapons: 18,
       equipment: 88,
     })
-    expect(getEditorAssetSlots('shoulders')).toEqual([
+    expect(getEditorAssetSlots('tops')).toEqual([
+      'clothing-body',
+      'clothing-arms',
+    ])
+    expect(getEditorAssetSlots('armor')).toEqual([
       'clothing-acc-pauldrons',
       'clothing-acc-pauldron',
     ])
     expect(editableAssets.every((asset) => getEditorAssetCategory(asset))).toBe(true)
+
+    const tops = getEditorAssetOptions(
+      catalog.assets.filter((asset) => asset.editorCategory === 'tops'
+        && asset.compatibleBodies.includes('quaternius.body.superhero-male')),
+      'tops',
+    )
+    expect(tops.map(({ name }) => name)).toEqual(['Peasant Top', 'Ranger Top'])
+    expect(tops.map(({ assets }) => assets.map(({ slot }) => slot))).toEqual([
+      ['clothing-body', 'clothing-arms'],
+      ['clothing-body', 'clothing-arms'],
+    ])
+
+    const armor = catalog.assets.find((asset) => asset.editorCategory === 'armor')
+    expect(armor.editorName).toBe('Ranger Shoulder Armor')
+    const outfits = getEditorAssetOptions(
+      catalog.assets.filter((asset) => asset.slot === 'outfit'
+        && asset.compatibleBodies.includes('quaternius.body.superhero-male')),
+      'outfits',
+    )
+    expect(outfits.map(({ name }) => name)).toEqual(['Peasant Outfit', 'Ranger Outfit'])
+
+    expect(updateSelectedRuntimeAssets({ body: 'body', hair: 'hair', outfit: 'old' }, {
+      id: 'shirt', category: 'clothing', slot: 'clothing-body',
+    })).toEqual({ body: 'body', hair: 'hair', 'clothing-body': 'shirt' })
+    expect(updateSelectedRuntimeAssets({
+      body: 'body', hair: 'hair', 'clothing-body': 'shirt', 'clothing-arms': 'sleeves',
+    }, { id: 'outfit', category: 'clothing', slot: 'outfit' })).toEqual({
+      body: 'body', hair: 'hair', outfit: 'outfit',
+    })
   })
 
   it('requires attachment metadata for props and rig metadata for animations', () => {

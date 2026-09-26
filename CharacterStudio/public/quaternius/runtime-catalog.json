@@ -192,7 +192,11 @@
       ],
       "slot": "clothing-arms",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Arms.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Arms.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.female-peasant-body",
@@ -209,7 +213,11 @@
       ],
       "slot": "clothing-body",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Body.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Peasant_Body.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.female-peasant-feet",
@@ -260,7 +268,9 @@
       ],
       "slot": "clothing-acc-pauldrons",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Acc_Pauldrons.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Acc_Pauldrons.gltf",
+      "editorCategory": "armor",
+      "editorName": "Ranger Shoulder Armor"
     },
     {
       "id": "quaternius.clothing.female-ranger-arms",
@@ -277,7 +287,11 @@
       ],
       "slot": "clothing-arms",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Arms.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Arms.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.female-ranger-body",
@@ -294,7 +308,11 @@
       ],
       "slot": "clothing-body",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Body.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Female_Ranger_Body.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.female-ranger-feet",
@@ -362,7 +380,11 @@
       ],
       "slot": "clothing-arms",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Arms.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Arms.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.male-peasant-body",
@@ -379,7 +401,11 @@
       ],
       "slot": "clothing-body",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Body.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Body.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.male-peasant-feet",
@@ -430,7 +456,9 @@
       ],
       "slot": "clothing-acc-pauldron",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Acc_Pauldron.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Acc_Pauldron.gltf",
+      "editorCategory": "armor",
+      "editorName": "Ranger Shoulder Armor"
     },
     {
       "id": "quaternius.clothing.male-ranger-arms",
@@ -447,7 +475,11 @@
       ],
       "slot": "clothing-arms",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Arms.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Arms.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.male-ranger-body",
@@ -464,7 +496,11 @@
       ],
       "slot": "clothing-body",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Body.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Ranger_Body.gltf",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.male-ranger-feet-boots",
@@ -532,7 +568,8 @@
       ],
       "slot": "outfit",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Peasant.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Peasant.gltf",
+      "editorName": "Peasant Outfit"
     },
     {
       "id": "quaternius.clothing.female-ranger",
@@ -549,7 +586,8 @@
       ],
       "slot": "outfit",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Ranger.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Female_Ranger.gltf",
+      "editorName": "Ranger Outfit"
     },
     {
       "id": "quaternius.clothing.male-peasant",
@@ -566,7 +604,8 @@
       ],
       "slot": "outfit",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Peasant.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Peasant.gltf",
+      "editorName": "Peasant Outfit"
     },
     {
       "id": "quaternius.clothing.male-ranger",
@@ -583,7 +622,8 @@
       ],
       "slot": "outfit",
       "runtimeStatus": "normalized-source",
-      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Ranger.gltf"
+      "sourcePath": "Character Outfits.zip:Modular Character Outfits - Fantasy[Standard]/Exports/glTF (Godot-Unreal)/Outfits/Male_Ranger.gltf",
+      "editorName": "Ranger Outfit"
     },
     {
       "id": "quaternius.prop.ring4",

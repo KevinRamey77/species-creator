@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { isAssetCompatible } from "./assetCatalog";
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from "three-mesh-bvh";
 
 const DEFAULT_SLOTS = {
   body: "body",
@@ -13,6 +14,10 @@ const DEFAULT_SLOTS = {
   accessory: "accessory",
   prop: "prop",
 };
+const LONG_HAIR_ASSET_ID = "quaternius.hair.hair-long";
+const HAIR_BUNS_ASSET_ID = "quaternius.hair.hair-buns";
+const CROWN_FIT_SCALE = 1.035;
+const DEFAULT_HAIR_COLOR = "#4a382b";
 
 const disposeObject = (object) => {
   object?.traverse?.((child) => {
@@ -120,32 +125,155 @@ export const prepareSkinnedMeshInfluences = (mesh) => {
   return true;
 };
 
-const getMeshMaterials = (mesh) => (
-  Array.isArray(mesh?.material) ? mesh.material : [mesh?.material]
-).filter(Boolean);
+const BODY_OCCLUSION_OFFSET = 0.08;
+const BODY_OCCLUSION_DEPTH = 0.2;
+const BODY_OCCLUSION_PROXIMITY = 0.045;
+const bodyOcclusionRaycaster = new THREE.Raycaster();
+const bodyOcclusionIntersections = [];
+const bodyOcclusionOrigin = new THREE.Vector3();
+const bodyOcclusionDirection = new THREE.Vector3();
+const bodyTrianglePositions = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+const bodyTriangleCentroid = new THREE.Vector3();
+const bodyTriangleNormal = new THREE.Vector3();
+const bodyTriangleEdge = new THREE.Vector3();
+const bodyOcclusionClosestHit = { point: new THREE.Vector3(), distance: Infinity, faceIndex: -1 };
 
-const captureBodyDepthWriteState = (root) => {
-  const bodyMesh = findSkinnedMesh(root);
-  if (!bodyMesh) return null;
+const createOcclusionProxy = (mesh) => {
+  const sourceGeometry = mesh.geometry;
+  const sourcePosition = sourceGeometry?.getAttribute?.("position");
+  if (!sourcePosition) return null;
 
-  return getMeshMaterials(bodyMesh).map((material) => ({
-    material,
-    depthWrite: material.depthWrite,
-  }));
+  const positions = new Float32Array(sourcePosition.count * 3);
+  const position = new THREE.Vector3();
+  for (let vertex = 0; vertex < sourcePosition.count; vertex += 1) {
+    if (mesh.isSkinnedMesh) mesh.getVertexPosition(vertex, position);
+    else position.fromBufferAttribute(sourcePosition, vertex);
+    mesh.localToWorld(position);
+    position.toArray(positions, vertex * 3);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  if (sourceGeometry.index) geometry.setIndex(sourceGeometry.index.clone());
+  computeBoundsTree.call(geometry);
+
+  const proxy = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }),
+  );
+  proxy.raycast = acceleratedRaycast;
+  proxy.updateMatrixWorld(true);
+  return proxy;
 };
 
-const setBodyDepthWrite = (state, depthWrite) => {
-  state?.forEach(({ material }) => {
-    material.depthWrite = depthWrite;
-    material.needsUpdate = true;
-  });
+const disposeOcclusionProxy = (proxy) => {
+  disposeBoundsTree.call(proxy.geometry);
+  proxy.geometry.dispose();
+  proxy.material.dispose();
 };
 
-const restoreBodyDepthWrite = (state) => {
-  state?.forEach(({ material, depthWrite }) => {
-    material.depthWrite = depthWrite;
-    material.needsUpdate = true;
+const findBodySurfaceMeshes = (root) => {
+  const meshes = [];
+  root?.traverse?.((child) => {
+    if (!child.isSkinnedMesh) return;
+    if (/superhero_(male|female)|fullbody|body/i.test(child.name || "")) meshes.push(child);
   });
+  return meshes.length > 0
+    ? meshes
+    : findSkinnedMeshes(root).filter((mesh) => !/face|eye|brow|hair/i.test(mesh.name || "")).slice(0, 1);
+};
+
+const isPointCoveredByGarment = (position, normal, garmentMeshes) => {
+  for (const side of [1, -1]) {
+    bodyOcclusionOrigin.copy(position).addScaledVector(normal, BODY_OCCLUSION_OFFSET * side);
+    bodyOcclusionDirection.copy(normal).multiplyScalar(-side);
+    bodyOcclusionRaycaster.set(bodyOcclusionOrigin, bodyOcclusionDirection);
+    bodyOcclusionRaycaster.near = 0;
+    bodyOcclusionRaycaster.far = BODY_OCCLUSION_OFFSET + BODY_OCCLUSION_DEPTH;
+    bodyOcclusionIntersections.length = 0;
+    bodyOcclusionRaycaster.intersectObjects(garmentMeshes, false, bodyOcclusionIntersections);
+    if (bodyOcclusionIntersections.length > 0) return true;
+  }
+  return garmentMeshes.some((mesh) => (
+    mesh.geometry.boundsTree?.closestPointToPoint(
+      position,
+      bodyOcclusionClosestHit,
+      0,
+      BODY_OCCLUSION_PROXIMITY,
+    ) != null
+  ));
+};
+
+const isBodyTriangleCovered = (positions, normal, garmentMeshes) => {
+  bodyTriangleCentroid.copy(positions[0])
+    .add(positions[1])
+    .add(positions[2])
+    .multiplyScalar(1 / 3);
+  if (!isPointCoveredByGarment(bodyTriangleCentroid, normal, garmentMeshes)) return false;
+
+  let coveredVertices = 0;
+  positions.forEach((position) => {
+    if (isPointCoveredByGarment(position, normal, garmentMeshes)) coveredVertices += 1;
+  });
+  return coveredVertices >= 2;
+};
+
+const createOccludedGeometry = (source, bodyMesh, garmentGroups) => {
+  const position = source?.getAttribute?.("position");
+  if (!position) return source?.clone?.() || null;
+
+  const sourceIndex = source.index;
+  const elementCount = sourceIndex?.count || position.count;
+  const keptTriangles = [];
+  for (let offset = 0; offset + 2 < elementCount; offset += 3) {
+    const vertices = [0, 1, 2].map((corner) => sourceIndex
+      ? sourceIndex.getX(offset + corner)
+      : offset + corner);
+    vertices.forEach((vertex, index) => {
+      bodyMesh.getVertexPosition(vertex, bodyTrianglePositions[index]);
+      bodyMesh.localToWorld(bodyTrianglePositions[index]);
+    });
+    bodyTriangleNormal.subVectors(bodyTrianglePositions[1], bodyTrianglePositions[0])
+      .cross(bodyTriangleEdge.subVectors(bodyTrianglePositions[2], bodyTrianglePositions[0]));
+    let covered = false;
+    if (bodyTriangleNormal.lengthSq() > 0) {
+      bodyTriangleNormal.normalize();
+      covered = garmentGroups.some((garmentMeshes) => (
+        isBodyTriangleCovered(bodyTrianglePositions, bodyTriangleNormal, garmentMeshes)
+      ));
+    }
+    if (covered) continue;
+
+    const materialIndex = source.groups.find((group) => (
+      offset >= group.start && offset < group.start + group.count
+    ))?.materialIndex;
+    keptTriangles.push({ vertices, materialIndex });
+  }
+
+  const geometry = source.clone();
+  const indices = keptTriangles.flatMap(({ vertices }) => vertices);
+  const maxIndex = indices.reduce((maximum, index) => Math.max(maximum, index), 0);
+  const IndexArray = maxIndex > 65535 || sourceIndex?.array instanceof Uint32Array
+    ? Uint32Array
+    : Uint16Array;
+  geometry.setIndex(new THREE.BufferAttribute(new IndexArray(indices), 1));
+  geometry.clearGroups();
+  if (source.groups.length > 0 && keptTriangles.length > 0) {
+    let groupStart = 0;
+    let groupMaterialIndex = keptTriangles[0].materialIndex || 0;
+    keptTriangles.forEach((triangle, triangleIndex) => {
+      const materialIndex = triangle.materialIndex || 0;
+      if (materialIndex === groupMaterialIndex) return;
+      geometry.addGroup(groupStart, triangleIndex * 3 - groupStart, groupMaterialIndex);
+      groupStart = triangleIndex * 3;
+      groupMaterialIndex = materialIndex;
+    });
+    geometry.addGroup(groupStart, indices.length - groupStart, groupMaterialIndex);
+  }
+  geometry.setDrawRange(0, indices.length);
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
 };
 
 const describeRuntimeMeshes = (root) => {
@@ -321,7 +449,8 @@ export class AssetAssemblyManager {
     this.bodySkeleton = null;
     this.bodyRestMatrices = new Map();
     this.poseBindings = new Map();
-    this.bodyDepthWriteState = null;
+    this.bodyOcclusionGeometryStates = new Map();
+    this.hairColor = DEFAULT_HAIR_COLOR;
     this.diagnosticCheckpointHandler = null;
     this.diagnosticPoseSyncPending = null;
     this.diagnosticPoseSyncAfterPending = null;
@@ -430,6 +559,10 @@ export class AssetAssemblyManager {
     model.position?.set?.(0, 0, 0);
     model.rotation?.set?.(0, 0, 0);
     model.scale?.setScalar?.(1);
+    if (asset.id === LONG_HAIR_ASSET_ID || asset.id === HAIR_BUNS_ASSET_ID) {
+      const activeBodyId = this.getActiveAsset("body")?.id || "";
+      model.scale.setScalar(/female/i.test(activeBodyId) ? 1 : CROWN_FIT_SCALE);
+    }
 
     await this.waitForDiagnosticCheckpoint("after-clothing-processing", { asset, model, manager: this });
     logClothingBoundary("after clothing processing", asset, model, this);
@@ -458,8 +591,7 @@ export class AssetAssemblyManager {
     const previous = this.activeAssets.get(targetSlot);
     if (previous) {
       if (targetSlot === "body") {
-        restoreBodyDepthWrite(this.bodyDepthWriteState);
-        this.bodyDepthWriteState = null;
+        this.restoreBodyOcclusion(true);
       }
       previous.model.parent?.remove?.(previous.model);
       this.root.remove(previous.model);
@@ -484,7 +616,6 @@ export class AssetAssemblyManager {
     model.updateMatrixWorld?.(true);
     if (targetSlot === "body") {
       this.bodySkeleton = getBodySkeleton(model);
-      this.bodyDepthWriteState = captureBodyDepthWriteState(model);
       const rootWorldInverse = getWorldMatrix(this.root).invert();
       this.bodyRestMatrices = new Map(
         this.bodySkeleton?.bones.map((bone) => [
@@ -493,6 +624,7 @@ export class AssetAssemblyManager {
         ]) || [],
       );
       console.info("[CharacterStudio] Body skeleton binding", describeSkeletonBinding(findSkinnedMesh(model)));
+      this.applyEyebrowColor(model);
     } else if (this.bodySkeleton && findSkinnedMeshes(model).length > 0 && !this.disableClothingPoseSync) {
       this.poseBindings.set(
         targetSlot,
@@ -522,7 +654,8 @@ export class AssetAssemblyManager {
     }
 
     this.activeAssets.set(targetSlot, { asset, model });
-  if (targetSlot !== "body") setBodyDepthWrite(this.bodyDepthWriteState, false);
+    if (asset.category === "hair") this.applyHairColor(model);
+    this.updateBodyOcclusion();
     const bounds = model?.isObject3D ? new THREE.Box3().setFromObject(model) : null;
     const size = bounds?.getSize(new THREE.Vector3()) || null;
     const diagnostics = typeof window !== "undefined"
@@ -627,21 +760,100 @@ export class AssetAssemblyManager {
     const current = this.activeAssets.get(slot);
     if (!current) return false;
 
+    if (slot === "body") this.restoreBodyOcclusion(true);
     this.root.remove(current.model);
     current.model.parent?.remove?.(current.model);
     disposeObject(current.model);
     this.poseBindings.delete(slot);
     if (slot === "body") {
-      restoreBodyDepthWrite(this.bodyDepthWriteState);
       this.bodySkeleton = null;
       this.bodyRestMatrices.clear();
-      this.bodyDepthWriteState = null;
     }
     this.activeAssets.delete(slot);
-    if (slot !== "body" && ![...this.activeAssets.keys()].some((activeSlot) => activeSlot !== "body")) {
-      restoreBodyDepthWrite(this.bodyDepthWriteState);
-    }
+    if (slot !== "body") this.updateBodyOcclusion();
     return true;
+  }
+
+  updateBodyOcclusion() {
+    const body = this.activeAssets.get("body")?.model;
+    const garmentMeshes = [...this.activeAssets.values()]
+      .filter(({ asset }) => asset?.category === "clothing")
+      .map(({ model }) => {
+        const meshes = [];
+        model.traverse?.((child) => {
+          if (child.isMesh && child.visible) meshes.push(child);
+        });
+        return meshes;
+      })
+      .filter((meshes) => meshes.length > 0);
+    if (!body || garmentMeshes.length === 0) {
+      this.restoreBodyOcclusion();
+      return;
+    }
+
+    this.poseBindings.forEach(syncPoseBinding);
+    this.root.updateMatrixWorld?.(true);
+    const garmentProxyGroups = garmentMeshes
+      .map((meshes) => meshes.map(createOcclusionProxy).filter(Boolean))
+      .filter((proxies) => proxies.length > 0);
+    if (garmentProxyGroups.length === 0) {
+      this.restoreBodyOcclusion();
+      return;
+    }
+
+    try {
+      findBodySurfaceMeshes(body).forEach((mesh) => {
+        let state = this.bodyOcclusionGeometryStates.get(mesh);
+        if (!state) {
+          state = { originalGeometry: mesh.geometry, occludedGeometry: null };
+          this.bodyOcclusionGeometryStates.set(mesh, state);
+        }
+        const occludedGeometry = createOccludedGeometry(state.originalGeometry, mesh, garmentProxyGroups);
+        state.occludedGeometry?.dispose();
+        state.occludedGeometry = occludedGeometry;
+        mesh.geometry = occludedGeometry;
+      });
+    } finally {
+      garmentProxyGroups.flat().forEach(disposeOcclusionProxy);
+    }
+  }
+
+  restoreBodyOcclusion(disposeHeadGeometry = false) {
+    this.bodyOcclusionGeometryStates.forEach(({ originalGeometry, occludedGeometry }, mesh) => {
+      mesh.geometry = originalGeometry;
+      if (disposeHeadGeometry) occludedGeometry?.dispose();
+    });
+    if (disposeHeadGeometry) this.bodyOcclusionGeometryStates.clear();
+  }
+
+  applyHairColor(model) {
+    model?.traverse?.((child) => {
+      if (!child.isMesh) return;
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.forEach((material) => {
+        if (material?.color?.isColor) material.color.set(this.hairColor);
+      });
+    });
+  }
+
+  applyEyebrowColor(model) {
+    model?.traverse?.((child) => {
+      if (!child.isMesh || !/eyebrow|brow/i.test(child.name || "")) return;
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.forEach((material) => {
+        if (material?.color?.isColor) material.color.set(this.hairColor);
+      });
+    });
+  }
+
+  setHairColor(color) {
+    if (typeof color !== "string" || !/^#[0-9a-f]{6}$/i.test(color)) return this.hairColor;
+    this.hairColor = color.toLowerCase();
+    [...this.activeAssets.values()]
+      .filter(({ asset }) => asset?.category === "hair")
+      .forEach(({ model }) => this.applyHairColor(model));
+    this.applyEyebrowColor(this.activeAssets.get("body")?.model);
+    return this.hairColor;
   }
 
   clear() {
@@ -652,8 +864,6 @@ export class AssetAssemblyManager {
     this.bodyRestMatrices.clear();
     this.poseBindings.clear();
     this.setDiagnosticCheckpointHandler(null);
-    restoreBodyDepthWrite(this.bodyDepthWriteState);
-    this.bodyDepthWriteState = null;
     [...this.activeAssets.keys()].forEach((slot) => this.removeAsset(slot));
   }
 }

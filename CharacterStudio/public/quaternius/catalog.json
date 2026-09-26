@@ -181,7 +181,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-arms",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.female-peasant-body",
@@ -197,7 +201,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-body",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.female-peasant-feet",
@@ -245,7 +253,9 @@
         "quaternius-standard"
       ],
       "slot": "clothing-acc-pauldrons",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "armor",
+      "editorName": "Ranger Shoulder Armor"
     },
     {
       "id": "quaternius.clothing.female-ranger-arms",
@@ -261,7 +271,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-arms",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.female-ranger-body",
@@ -277,7 +291,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-body",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.female-ranger-feet",
@@ -341,7 +359,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-arms",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.male-peasant-body",
@@ -357,7 +379,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-body",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.peasant",
+      "editorGroupLabel": "Peasant Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.male-peasant-feet",
@@ -405,7 +431,9 @@
         "quaternius-standard"
       ],
       "slot": "clothing-acc-pauldron",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "armor",
+      "editorName": "Ranger Shoulder Armor"
     },
     {
       "id": "quaternius.clothing.male-ranger-arms",
@@ -421,7 +449,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-arms",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "arms"
     },
     {
       "id": "quaternius.clothing.male-ranger-body",
@@ -437,7 +469,11 @@
         "quaternius-standard"
       ],
       "slot": "clothing-body",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorCategory": "tops",
+      "editorGroupId": "tops.ranger",
+      "editorGroupLabel": "Ranger Top",
+      "editorPart": "torso"
     },
     {
       "id": "quaternius.clothing.male-ranger-feet-boots",
@@ -501,7 +537,8 @@
         "quaternius-standard"
       ],
       "slot": "outfit",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorName": "Peasant Outfit"
     },
     {
       "id": "quaternius.clothing.female-ranger",
@@ -517,7 +554,8 @@
         "quaternius-standard"
       ],
       "slot": "outfit",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorName": "Ranger Outfit"
     },
     {
       "id": "quaternius.clothing.male-peasant",
@@ -533,7 +571,8 @@
         "quaternius-standard"
       ],
       "slot": "outfit",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorName": "Peasant Outfit"
     },
     {
       "id": "quaternius.clothing.male-ranger",
@@ -549,7 +588,8 @@
         "quaternius-standard"
       ],
       "slot": "outfit",
-      "runtimeStatus": "pending-normalization"
+      "runtimeStatus": "pending-normalization",
+      "editorName": "Ranger Outfit"
     },
     {
       "id": "quaternius.prop.ring4",

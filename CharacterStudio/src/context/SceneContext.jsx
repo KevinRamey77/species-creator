@@ -1,4 +1,4 @@
-import { AssetCatalog } from "../library/assetCatalog"
+import { AssetCatalog, updateSelectedRuntimeAssets } from "../library/assetCatalog"
 import { AssetAssemblyManager } from "../library/assetAssemblyManager"
 import { AssetRuntimeLoader } from "../library/assetRuntimeLoader"
 import * as THREE from "three"
@@ -52,6 +52,7 @@ export const SceneProvider = (props) => {
   const [runtimeBodyLoading, setRuntimeBodyLoading] = useState(false)
   const [runtimeBodyError, setRuntimeBodyError] = useState(null)
   const [selectedRuntimeAssets, setSelectedRuntimeAssets] = useState({})
+  const [runtimeHairColor, setRuntimeHairColorState] = useState("#4a382b")
 
   const [manifest, setManifest] = useState(null)
   const [debugMode, setDebugMode] = useState(false);
@@ -318,11 +319,14 @@ export const SceneProvider = (props) => {
       bodyId: selectedRuntimeBody.id,
       rig: "quaternius-standard",
     })
-    setSelectedRuntimeAssets((current) => ({
-      ...current,
-      [asset.slot || asset.category]: asset.id,
-    }))
+    setSelectedRuntimeAssets((current) => updateSelectedRuntimeAssets(current, asset))
     return asset
+  }
+
+  const setRuntimeHairColor = (color) => {
+    const nextColor = assetAssemblyManager.setHairColor(color)
+    setRuntimeHairColorState(nextColor)
+    return nextColor
   }
 
   const clearRuntimeAsset = (slot) => {
@@ -343,6 +347,34 @@ export const SceneProvider = (props) => {
       delete next[slot]
       return next
     })
+  }
+
+  const selectRuntimeAssetGroup = async (assets) => {
+    const affectedSlots = new Set([
+      "outfit",
+      ...assets.map((asset) => asset.slot || asset.category),
+    ])
+    const previousAssets = [...affectedSlots]
+      .map((slot) => assetCatalog.getById(selectedRuntimeAssets[slot]))
+      .filter(Boolean)
+
+    try {
+      for (const asset of assets) {
+        await selectRuntimeAsset(asset)
+      }
+    } catch (error) {
+      affectedSlots.forEach(clearRuntimeAsset)
+      try {
+        for (const asset of previousAssets) {
+          await selectRuntimeAsset(asset)
+        }
+      } catch (restoreError) {
+        console.error("Failed to restore appearance after grouped selection", restoreError)
+      }
+      throw error
+    }
+
+    return assets
   }
 
   return (
@@ -378,7 +410,10 @@ export const SceneProvider = (props) => {
         clearRuntimeBody,
         selectedRuntimeAssets,
         selectRuntimeAsset,
+        selectRuntimeAssetGroup,
         clearRuntimeAsset,
+        runtimeHairColor,
+        setRuntimeHairColor,
       }}
     >
       {props.children}

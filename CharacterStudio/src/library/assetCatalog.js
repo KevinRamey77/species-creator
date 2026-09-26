@@ -14,30 +14,43 @@ const REQUIRED_FIELDS = ["id", "name", "category", "source", "format", "path"];
 export const EDITOR_ASSET_CATEGORIES = [
   { id: "body", label: "Body", shortLabel: "Body" },
   { id: "hair", label: "Hair", shortLabel: "Hair" },
+  { id: "outfits", label: "Outfits", shortLabel: "Outfits" },
+  { id: "tops", label: "Tops", shortLabel: "Tops" },
   { id: "head", label: "Head", shortLabel: "Head" },
-  { id: "torso", label: "Torso", shortLabel: "Torso" },
-  { id: "arms", label: "Arms", shortLabel: "Arms" },
   { id: "legs", label: "Legs", shortLabel: "Legs" },
   { id: "feet", label: "Feet", shortLabel: "Feet" },
-  { id: "shoulders", label: "Shoulders", shortLabel: "Shoulders" },
+  { id: "armor", label: "Armor", shortLabel: "Armor" },
   { id: "weapons", label: "Weapons", shortLabel: "Weapons" },
   { id: "equipment", label: "Equipment", shortLabel: "Equipment" },
-  { id: "outfits", label: "Outfits", shortLabel: "Outfits" },
+];
+
+export const ADVANCED_EDITOR_ASSET_CATEGORIES = [
+  { id: "torso", label: "Torso", shortLabel: "Torso" },
+  { id: "arms", label: "Arms", shortLabel: "Arms" },
 ];
 
 const EDITOR_CATEGORY_SLOTS = {
   body: ["body"],
   hair: ["hair"],
   head: ["clothing-head-hood"],
-  torso: ["clothing-body"],
-  arms: ["clothing-arms"],
+  tops: ["clothing-body", "clothing-arms"],
   legs: ["clothing-legs"],
   feet: ["clothing-feet"],
-  shoulders: ["clothing-acc-pauldrons", "clothing-acc-pauldron"],
+  armor: ["clothing-acc-pauldrons", "clothing-acc-pauldron"],
   weapons: ["prop"],
   equipment: ["prop"],
   outfits: ["outfit"],
 };
+
+const ADVANCED_CATEGORY_SLOTS = {
+  torso: ["clothing-body"],
+  arms: ["clothing-arms"],
+};
+
+const EDITOR_CATEGORY_IDS = new Set([
+  ...EDITOR_ASSET_CATEGORIES.map(({ id }) => id),
+  ...ADVANCED_EDITOR_ASSET_CATEGORIES.map(({ id }) => id),
+]);
 
 const WEAPON_NAME_PARTS = ["sword", "dagger", "hammer", "axe", "bow", "arrow", "dart"];
 
@@ -47,10 +60,13 @@ const isWeaponProp = (asset) => {
   return WEAPON_NAME_PARTS.some((part) => metadata.includes(part));
 };
 
-export const getEditorAssetSlots = (category) => [...(EDITOR_CATEGORY_SLOTS[category] || [])];
+export const getEditorAssetSlots = (category) => [
+  ...(EDITOR_CATEGORY_SLOTS[category] || ADVANCED_CATEGORY_SLOTS[category] || []),
+];
 
 export const getEditorAssetCategory = (asset) => {
   if (!asset) return null;
+  if (EDITOR_CATEGORY_IDS.has(asset.editorCategory)) return asset.editorCategory;
   if (asset.category === "body") return "body";
   if (asset.category === "hair") return "hair";
   if (asset.category === "prop") return isWeaponProp(asset) ? "weapons" : "equipment";
@@ -58,6 +74,51 @@ export const getEditorAssetCategory = (asset) => {
 
   return Object.entries(EDITOR_CATEGORY_SLOTS)
     .find(([, slots]) => slots.includes(asset.slot))?.[0] || null;
+};
+
+export const getEditorAssetOptions = (assets, category) => {
+  if (category !== "tops") {
+    return assets.map((asset) => ({
+      id: asset.id,
+      name: asset.editorName || asset.name,
+      assets: [asset],
+    }));
+  }
+
+  const groups = new Map();
+  assets.forEach((asset) => {
+    if (!asset.editorGroupId || !["torso", "arms"].includes(asset.editorPart)) return;
+    if (!groups.has(asset.editorGroupId)) {
+      groups.set(asset.editorGroupId, {
+        id: asset.editorGroupId,
+        name: asset.editorGroupLabel,
+        parts: {},
+      });
+    }
+    groups.get(asset.editorGroupId).parts[asset.editorPart] = asset;
+  });
+
+  return [...groups.values()]
+    .filter(({ parts }) => parts.torso && parts.arms)
+    .map(({ id, name, parts }) => ({ id, name, assets: [parts.torso, parts.arms] }));
+};
+
+export const updateSelectedRuntimeAssets = (current, asset) => {
+  const slot = asset.slot || asset.category;
+  const next = { ...current };
+
+  if (asset.category === "clothing") {
+    if (slot === "outfit") {
+      Object.keys(next)
+        .filter((activeSlot) => activeSlot !== "body" && activeSlot !== "hair")
+        .forEach((activeSlot) => delete next[activeSlot]);
+    } else {
+      delete next.outfit;
+    }
+  }
+
+  next[slot] = asset.id;
+  return next;
 };
 
 const isNonEmptyString = (value) => typeof value === "string" && value.trim() !== "";
@@ -199,6 +260,9 @@ export class AssetCatalog {
   getByEditorCategory(category) {
     if (!this.catalog) return [];
     assertValidAssetCatalog(this.catalog);
+    if (ADVANCED_CATEGORY_SLOTS[category]) {
+      return this.getAll().filter((asset) => ADVANCED_CATEGORY_SLOTS[category].includes(asset.slot));
+    }
     return this.getAll().filter((asset) => getEditorAssetCategory(asset) === category);
   }
 

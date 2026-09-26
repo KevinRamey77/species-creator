@@ -53,11 +53,23 @@ const outfitAssets = (archive, entries) => entries
     const gender = /Female/.test(name) ? "female" : "male";
     const suffix = name.replace(/^(Female|Male)_/, "");
     const part = suffix.match(/_(Arms|Body|Feet|Legs|Head_Hood|Acc_Pauldrons?)(?:_Boots)?$/)?.[1];
+    const topMatch = suffix.match(/^(.+)_(Arms|Body)$/);
+    const armorMatch = suffix.match(/^(.+)_Acc_Pauldrons?$/);
+    const topStyle = topMatch?.[1].replace(/_/g, " ");
+    const armorStyle = armorMatch?.[1].replace(/_/g, " ");
     const id = `quaternius.clothing.${slug(name)}`;
     return {
       id, name: name.replace(/_/g, " "), category: "clothing", source: "quaternius", format: "gltf",
       path: sourcePath(archive, entry), compatibleBodies: [bodyId(gender)], compatibleRigs: ["quaternius-standard"],
       ...(part ? { slot: `clothing-${slug(part)}` } : { slot: "outfit" }),
+      ...(topMatch ? {
+        editorCategory: "tops",
+        editorGroupId: `tops.${slug(topMatch[1])}`,
+        editorGroupLabel: `${topStyle} Top`,
+        editorPart: topMatch[2] === "Body" ? "torso" : "arms",
+      } : {}),
+      ...(armorMatch ? { editorCategory: "armor", editorName: `${armorStyle} Shoulder Armor` } : {}),
+      ...(!part ? { editorName: `${suffix.replace(/_/g, " ")} Outfit` } : {}),
       runtimeStatus: "pending-normalization",
     };
   });

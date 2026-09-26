@@ -21,9 +21,12 @@ import RightPanel from "../components/RightPanel"
 import SaleIcon from "../images/sale-icon.png"
 import MenuTitle from "../components/MenuTitle"
 import {
+  ADVANCED_EDITOR_ASSET_CATEGORIES,
   EDITOR_ASSET_CATEGORIES,
+  getEditorAssetOptions,
   getEditorAssetSlots,
 } from "../library/assetCatalog"
+import AssetPreview from "../components/AssetPreview"
 
   /**
    * @typedef {import("../library/CharacterManifestData.js").TraitModelsGroup} TraitModelsGroup
@@ -598,18 +601,30 @@ function Appearance() {
     selectedRuntimeAssets,
     clearRuntimeBody,
     selectRuntimeAsset,
+    selectRuntimeAssetGroup,
     clearRuntimeAsset,
+    runtimeHairColor,
+    setRuntimeHairColor,
   } = React.useContext(SceneContext)
   const { t } = useContext(LanguageContext)
-  const [assetCategory, setAssetCategory] = React.useState("hair")
+  const [assetCategory, setAssetCategory] = React.useState("outfits")
+  const [showAdvancedCategories, setShowAdvancedCategories] = React.useState(false)
   const [assetSelectionError, setAssetSelectionError] = React.useState(null)
+  const [isSelectingAsset, setIsSelectingAsset] = React.useState(false)
   const assetCategories = EDITOR_ASSET_CATEGORIES.map((category) => ({
     ...category,
     icon: category.label.slice(0, 1),
   }))
+  const advancedAssetCategories = ADVANCED_EDITOR_ASSET_CATEGORIES.map((category) => ({
+    ...category,
+    icon: category.label.slice(0, 1),
+  }))
+  const visibleCategories = showAdvancedCategories
+    ? [...assetCategories, ...advancedAssetCategories]
+    : assetCategories
 
   React.useEffect(() => {
-    setAssetCategory("hair")
+    setAssetCategory("outfits")
     setAssetSelectionError(null)
   }, [selectedRuntimeBody?.id])
 
@@ -629,6 +644,7 @@ function Appearance() {
           })
         : []
     : []
+  const assetOptions = getEditorAssetOptions(visibleAssets, assetCategory)
 
   const selectedAssetForCategory = getEditorAssetSlots(assetCategory)
     .map((slot) => selectedRuntimeAssets?.[slot])
@@ -637,10 +653,17 @@ function Appearance() {
 
   const selectAsset = async (asset) => {
     setAssetSelectionError(null)
+    setIsSelectingAsset(true)
     try {
-      await selectRuntimeAsset(asset)
+      if (asset.assets.length > 1) {
+        await selectRuntimeAssetGroup(asset.assets)
+      } else {
+        await selectRuntimeAsset(asset.assets[0])
+      }
     } catch (error) {
       setAssetSelectionError(error.message)
+    } finally {
+      setIsSelectingAsset(false)
     }
   }
 
@@ -649,7 +672,11 @@ function Appearance() {
     setAssetSelectionError(null)
   }
 
-  const activeCategory = assetCategories.find((category) => category.id === assetCategory)
+  const activeCategory = [...assetCategories, ...advancedAssetCategories]
+    .find((category) => category.id === assetCategory)
+  const showHairColor = assetCategory === "hair" && Boolean(selectedRuntimeAssets?.hair)
+  const showAssetPreviews = ["tops", "outfits", "armor", "torso", "arms", "legs", "feet", "head"]
+    .includes(assetCategory)
 
   return (
     <main className={styles.editorPage}>
@@ -666,7 +693,7 @@ function Appearance() {
 
       <aside className={styles.categoryRail} aria-label="Appearance categories">
         <div className={styles.railLabel}>Build</div>
-        {assetCategories.map((category) => (
+        {visibleCategories.map((category) => (
           <button
             key={category.id}
             type="button"
@@ -677,6 +704,19 @@ function Appearance() {
             <span>{category.shortLabel}</span>
           </button>
         ))}
+        <button
+          type="button"
+          className={`${styles.customizeToggle} ${showAdvancedCategories ? styles.customizeToggleActive : ""}`}
+          aria-expanded={showAdvancedCategories}
+          onClick={() => {
+            if (showAdvancedCategories && ["torso", "arms"].includes(assetCategory)) {
+              setAssetCategory("tops")
+            }
+            setShowAdvancedCategories((value) => !value)
+          }}
+        >
+          {showAdvancedCategories ? "Done" : "Customize"}
+        </button>
       </aside>
 
       <section className={styles.assetDrawer} aria-label={`${activeCategory.label} options`}>
@@ -689,27 +729,56 @@ function Appearance() {
             <button type="button" className={styles.clearButton} onClick={clearAssetCategory}>Clear</button>
           )}
         </div>
+        {showHairColor && (
+          <label className={styles.hairColorControl}>
+            <span>Hair color</span>
+            <span className={styles.hairColorValue}>{runtimeHairColor.toUpperCase()}</span>
+            <input
+              className={styles.hairColorInput}
+              type="color"
+              aria-label="Hair color"
+              value={runtimeHairColor}
+              onChange={(event) => setRuntimeHairColor(event.target.value)}
+            />
+          </label>
+        )}
         {assetCatalogLoading && <p className={styles.drawerMessage}>Loading Quaternius library...</p>}
         {assetCatalogError && <p className={styles.drawerMessage}>Asset catalog unavailable.</p>}
         {!assetCatalogLoading && !assetCatalogError && assetCategory !== "body" && !selectedRuntimeBody && (
           <p className={styles.drawerMessage}>Choose a body first to unlock compatible assets.</p>
         )}
         {!assetCatalogLoading && !assetCatalogError && (assetCategory === "body" || selectedRuntimeBody) && (
-          <div className={styles.assetList}>
-            {visibleAssets.map((asset, index) => {
-              const slot = asset.slot || asset.category
-              const active = selectedRuntimeAssets?.[slot] === asset.id
+          <div className={`${styles.assetList} ${showHairColor ? styles.assetListWithColor : ""} ${showAssetPreviews ? styles.assetListPreviewed : ""}`}>
+            {assetOptions.map((option) => {
+              const active = option.assets.every((asset) => (
+                selectedRuntimeAssets?.[asset.slot || asset.category] === asset.id
+              ))
+              const previewPaths = option.assets.map(({ path }) => path).join("|")
+              const description = assetCategory === "tops"
+                ? "Torso and arms together"
+                : assetCategory === "outfits"
+                  ? "Complete look"
+                  : assetCategory === "armor"
+                    ? "Shoulder armor"
+                    : activeCategory.label
               return (
                 <button
-                  key={asset.id}
+                  key={option.id}
                   type="button"
-                  className={`${styles.assetCard} ${active ? styles.assetCardActive : ""}`}
-                  onClick={() => selectAsset(asset)}
+                  className={`${styles.assetCard} ${showAssetPreviews ? styles.assetCardPreviewed : ""} ${active ? styles.assetCardActive : ""}`}
+                  onClick={() => selectAsset(option)}
+                  disabled={isSelectingAsset}
                 >
-                  <span className={`${styles.assetSwatch} ${styles[`assetSwatch${(index % 5) + 1}`]}`}>{asset.name.slice(0, 1)}</span>
+                  {showAssetPreviews && (
+                    <AssetPreview
+                      assetPaths={previewPaths}
+                      className={styles.assetPreview}
+                      errorClassName={styles.assetPreviewError}
+                    />
+                  )}
                   <span className={styles.assetInfo}>
-                    <strong>{asset.name}</strong>
-                    <small>{asset.slot || asset.attachmentBone || "Quaternius asset"}</small>
+                    <strong>{option.name}</strong>
+                    <small>{description}</small>
                   </span>
                   {active && <span className={styles.assetCheck}>Selected</span>}
                 </button>

@@ -6,6 +6,36 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 
 export function sceneInitializer(canvasId) {
     const scene = new THREE.Scene()
+    scene.background = new THREE.Color("#020905")
+    scene.fog = new THREE.Fog("#020905", 12, 26)
+
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(40, 40),
+        new THREE.MeshStandardMaterial({ color: "#04100a", roughness: 0.96 }),
+    )
+    floor.rotation.x = -Math.PI / 2
+    floor.position.y = -0.015
+    floor.receiveShadow = true
+    scene.add(floor)
+
+    const makeGrid = () => {
+        const grid = new THREE.GridHelper(12, 32, "#00ff78", "#00b457")
+        const materials = Array.isArray(grid.material) ? grid.material : [grid.material]
+        materials.forEach((material) => {
+            material.transparent = true
+            material.opacity = 0.66
+            material.depthWrite = false
+        })
+        return grid
+    }
+    const floorGrid = makeGrid()
+    floorGrid.position.y = 0.008
+    scene.add(floorGrid)
+
+    const wallGrid = makeGrid()
+    wallGrid.rotation.x = Math.PI / 2
+    wallGrid.position.set(0, 6, -4.2)
+    scene.add(wallGrid)
 
     
     new RGBELoader().load(`${import.meta.env.BASE_URL}hdr/studio_small_09_2k.hdr`, (hdr_) => {

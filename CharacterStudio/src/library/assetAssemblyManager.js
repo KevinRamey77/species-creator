@@ -128,6 +128,11 @@ export const prepareSkinnedMeshInfluences = (mesh) => {
 const BODY_OCCLUSION_OFFSET = 0.08;
 const BODY_OCCLUSION_DEPTH = 0.2;
 const BODY_OCCLUSION_PROXIMITY = 0.045;
+const BODY_OCCLUSION_PROTECTED_BONE_WEIGHT = 0.95;
+const BODY_OCCLUSION_PROTECTED_NECK_RADIUS = 0.16;
+const BODY_OCCLUSION_PROTECTED_HEAD_RADIUS = 0.18;
+const BODY_OCCLUSION_PROTECTED_HEAD_HALF_EXTENT = 0.24;
+const BODY_OCCLUSION_HEAD_BASE_OFFSET = 0.1;
 const bodyOcclusionRaycaster = new THREE.Raycaster();
 const bodyOcclusionIntersections = [];
 const bodyOcclusionOrigin = new THREE.Vector3();
@@ -136,6 +141,9 @@ const bodyTrianglePositions = [new THREE.Vector3(), new THREE.Vector3(), new THR
 const bodyTriangleCentroid = new THREE.Vector3();
 const bodyTriangleNormal = new THREE.Vector3();
 const bodyTriangleEdge = new THREE.Vector3();
+const bodyNeckSegment = new THREE.Line3(new THREE.Vector3(), new THREE.Vector3());
+const bodyNeckClosestPoint = new THREE.Vector3();
+const bodyHeadPosition = new THREE.Vector3();
 const bodyOcclusionClosestHit = { point: new THREE.Vector3(), distance: Infinity, faceIndex: -1 };
 
 const createOcclusionProxy = (mesh) => {
@@ -194,6 +202,7 @@ const isPointCoveredByGarment = (position, normal, garmentMeshes) => {
     bodyOcclusionRaycaster.intersectObjects(garmentMeshes, false, bodyOcclusionIntersections);
     if (bodyOcclusionIntersections.length > 0) return true;
   }
+
   return garmentMeshes.some((mesh) => (
     mesh.geometry.boundsTree?.closestPointToPoint(
       position,
@@ -218,11 +227,24 @@ const isBodyTriangleCovered = (positions, normal, garmentMeshes) => {
   return coveredVertices >= 2;
 };
 
-const createOccludedGeometry = (source, bodyMesh, garmentGroups) => {
+const createOccludedGeometry = (source, bodyMesh, garmentGroups, forceFullBodyOcclusion = false) => {
   const position = source?.getAttribute?.("position");
   if (!position) return source?.clone?.() || null;
 
   const sourceIndex = source.index;
+  const skinIndex = source.getAttribute("skinIndex");
+  const skinWeight = source.getAttribute("skinWeight");
+  const protectedBoneIndices = new Set(
+    bodyMesh.skeleton?.bones
+      .map((bone, index) => /head|face|jaw|eye|hand|wrist|finger|thumb|index|middle|ring|pinky/i.test(bone.name || "") ? index : -1)
+      .filter((index) => index >= 0) || [],
+  );
+  const neckBone = bodyMesh.skeleton?.bones.find((bone) => /^neck/i.test(bone.name || ""));
+  const headBone = bodyMesh.skeleton?.bones.find((bone) => /^head/i.test(bone.name || ""));
+  if (neckBone && headBone) {
+    bodyNeckSegment.set(neckBone.getWorldPosition(new THREE.Vector3()), headBone.getWorldPosition(new THREE.Vector3()));
+  }
+  if (headBone) headBone.getWorldPosition(bodyHeadPosition);
   const elementCount = sourceIndex?.count || position.count;
   const keptTriangles = [];
   for (let offset = 0; offset + 2 < elementCount; offset += 3) {
@@ -235,12 +257,41 @@ const createOccludedGeometry = (source, bodyMesh, garmentGroups) => {
     });
     bodyTriangleNormal.subVectors(bodyTrianglePositions[1], bodyTrianglePositions[0])
       .cross(bodyTriangleEdge.subVectors(bodyTrianglePositions[2], bodyTrianglePositions[0]));
-    let covered = false;
-    if (bodyTriangleNormal.lengthSq() > 0) {
-      bodyTriangleNormal.normalize();
+    let covered = forceFullBodyOcclusion;
+    const hasNormal = bodyTriangleNormal.lengthSq() > 0;
+    if (hasNormal) bodyTriangleNormal.normalize();
+    if (!covered && hasNormal) {
       covered = garmentGroups.some((garmentMeshes) => (
         isBodyTriangleCovered(bodyTrianglePositions, bodyTriangleNormal, garmentMeshes)
       ));
+    }
+    if (covered && skinIndex && skinWeight && protectedBoneIndices.size > 0) {
+      const isProtectedTriangle = vertices.every((vertex) => {
+        let protectedWeight = 0;
+        for (let component = 0; component < Math.min(skinIndex.itemSize, skinWeight.itemSize); component += 1) {
+          if (protectedBoneIndices.has(skinIndex.getComponent(vertex, component))) {
+            protectedWeight += skinWeight.getComponent(vertex, component);
+          }
+        }
+        return protectedWeight >= BODY_OCCLUSION_PROTECTED_BONE_WEIGHT;
+      });
+      const isNearNeck = neckBone && headBone && bodyTrianglePositions.every((vertex) => {
+        bodyNeckSegment.closestPointToPoint(vertex, true, bodyNeckClosestPoint);
+        return bodyNeckClosestPoint.distanceToSquared(vertex)
+          <= BODY_OCCLUSION_PROTECTED_NECK_RADIUS ** 2;
+      });
+      const isNearHead = headBone && bodyTrianglePositions.every((vertex) => (
+        bodyHeadPosition.distanceToSquared(vertex) <= BODY_OCCLUSION_PROTECTED_HEAD_RADIUS ** 2
+      ));
+      const isHeadRegion = forceFullBodyOcclusion
+        && bodyTriangleCentroid.y >= bodyHeadPosition.y + BODY_OCCLUSION_HEAD_BASE_OFFSET
+        && bodyTrianglePositions.every((vertex) => (
+          Math.abs(vertex.x - bodyHeadPosition.x) <= BODY_OCCLUSION_PROTECTED_HEAD_HALF_EXTENT
+          && Math.abs(vertex.z - bodyHeadPosition.z) <= BODY_OCCLUSION_PROTECTED_HEAD_HALF_EXTENT
+        ));
+      if (isProtectedTriangle || isNearNeck || isHeadRegion || (!forceFullBodyOcclusion && isNearHead)) {
+        covered = false;
+      }
     }
     if (covered) continue;
 
@@ -793,6 +844,7 @@ export class AssetAssemblyManager {
 
     this.poseBindings.forEach(syncPoseBinding);
     this.root.updateMatrixWorld?.(true);
+    const forceFullBodyOcclusion = this.getActiveAsset("outfit")?.category === "clothing";
     const garmentProxyGroups = garmentMeshes
       .map((meshes) => meshes.map(createOcclusionProxy).filter(Boolean))
       .filter((proxies) => proxies.length > 0);
@@ -808,7 +860,12 @@ export class AssetAssemblyManager {
           state = { originalGeometry: mesh.geometry, occludedGeometry: null };
           this.bodyOcclusionGeometryStates.set(mesh, state);
         }
-        const occludedGeometry = createOccludedGeometry(state.originalGeometry, mesh, garmentProxyGroups);
+        const occludedGeometry = createOccludedGeometry(
+          state.originalGeometry,
+          mesh,
+          garmentProxyGroups,
+          forceFullBodyOcclusion,
+        );
         state.occludedGeometry?.dispose();
         state.occludedGeometry = occludedGeometry;
         mesh.geometry = occludedGeometry;

@@ -127,6 +127,54 @@ const getSkinnedWorldBounds = (root, meshName, includePoint = () => true) => {
   return foundMesh ? bounds : null
 }
 
+const countTrianglesInRegion = (mesh, includePoint) => {
+  const geometry = mesh.geometry
+  const index = geometry.index
+  if (!index) return 0
+  const vertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
+  let count = 0
+  mesh.updateMatrixWorld(true)
+  for (let offset = 0; offset + 2 < index.count; offset += 3) {
+    vertices.forEach((vertex, corner) => {
+      mesh.getVertexPosition(index.getX(offset + corner), vertex)
+      mesh.localToWorld(vertex)
+    })
+    const centroid = vertices[0].clone().add(vertices[1]).add(vertices[2]).multiplyScalar(1 / 3)
+    if (includePoint(centroid)) count += 1
+  }
+  return count
+}
+
+const countHandWeightedTriangles = (mesh) => {
+  const index = mesh.geometry.index
+  const skinIndex = mesh.geometry.getAttribute('skinIndex')
+  const skinWeight = mesh.geometry.getAttribute('skinWeight')
+  const protectedBoneIndices = new Set(mesh.skeleton.bones
+    .map((bone, boneIndex) => /hand|wrist|finger|thumb|index|middle|ring|pinky/i.test(bone.name || '') ? boneIndex : -1)
+    .filter((boneIndex) => boneIndex >= 0))
+  const vertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
+  let count = 0
+  mesh.updateMatrixWorld(true)
+  for (let offset = 0; offset + 2 < index.count; offset += 3) {
+    const triangleVertices = [0, 1, 2].map((corner) => index.getX(offset + corner))
+    vertices.forEach((vertex, corner) => {
+      mesh.getVertexPosition(triangleVertices[corner], vertex)
+      mesh.localToWorld(vertex)
+    })
+    const isProtected = triangleVertices.every((vertex) => {
+      let protectedWeight = 0
+      for (let component = 0; component < Math.min(skinIndex.itemSize, skinWeight.itemSize); component += 1) {
+        if (protectedBoneIndices.has(skinIndex.getComponent(vertex, component))) {
+          protectedWeight += skinWeight.getComponent(vertex, component)
+        }
+      }
+      return protectedWeight >= 0.95
+    })
+    if (isProtected) count += 1
+  }
+  return count
+}
+
 describe('AssetAssemblyManager pose retargeting', () => {
   it('preserves independent clothing bind data and transfers only the body pose delta', async () => {
     const body = createModel({ offset: 1, bindTranslation: 3, label: 'body' })
@@ -408,6 +456,84 @@ describe('AssetAssemblyManager pose retargeting', () => {
     const bunsBounds = getSkinnedWorldBounds(manager.activeAssets.get('hair').model, 'Hair_Buns')
     expect(bunsBounds.max.y).toBeGreaterThan(bodyHeadBounds.max.y)
   })
+
+  it('preserves the neck and face while culling torso skin under clothing and outfits', async () => {
+    const bodyModel = await loadNormalizedGltf(
+      'quaternius/normalized/body/quaternius-body-superhero-male/Superhero_Male_FullBody',
+    )
+    const torsoModel = await loadNormalizedGltf(
+      'quaternius/normalized/clothing/quaternius-clothing-male-peasant-body/Male_Peasant_Body',
+    )
+    const hoodModel = await loadNormalizedGltf(
+      'quaternius/normalized/clothing/quaternius-clothing-male-ranger-head-hood/Male_Ranger_Head_Hood',
+    )
+    const rangerOutfitModel = await loadNormalizedGltf(
+      'quaternius/normalized/clothing/quaternius-clothing-male-ranger/Male_Ranger',
+    )
+    const bodyAsset = createAsset('body', 'body', 'body')
+    const torsoAsset = createAsset('peasant-torso', 'clothing', 'clothing-body', ['body'])
+    const hoodAsset = createAsset('ranger-hood', 'clothing', 'clothing-head-hood', ['body'])
+    const rangerOutfitAsset = createAsset('ranger-outfit', 'clothing', 'outfit', ['body'])
+    const manager = new AssetAssemblyManager({
+      loader: {
+        loadAsync: vi.fn(async (asset) => ({
+          scene: asset.id === bodyAsset.id
+            ? bodyModel
+            : asset.id === torsoAsset.id
+              ? torsoModel
+              : asset.id === hoodAsset.id
+                ? hoodModel
+                  : rangerOutfitModel,
+        })),
+      },
+    })
+    let bodyMesh
+    bodyModel.traverse((child) => {
+      if (child.isSkinnedMesh && child.name === 'SuperHero_Male') bodyMesh = child
+    })
+    const originalHandTriangleCount = countHandWeightedTriangles(bodyMesh)
+    expect(originalHandTriangleCount).toBeGreaterThan(0)
+    const upperBodyBands = [1.65, 1.8, 1.95]
+    const originalTriangleCounts = upperBodyBands.map((minimumY) => countTrianglesInRegion(
+      bodyMesh,
+      (point) => point.y > minimumY && Math.abs(point.x) < 0.25,
+    ))
+    const torsoSides = [-1, 1]
+    const originalTorsoSideCounts = torsoSides.map((side) => countTrianglesInRegion(
+      bodyMesh,
+      (point) => point.y > 0.8 && point.y < 1.65 && Math.abs(point.x) < 0.25 && point.z * side > 0,
+    ))
+
+    await manager.setAsset('body', bodyAsset, { rig: 'quaternius-standard' })
+    await manager.setAsset('clothing-body', torsoAsset, { bodyId: 'body', rig: 'quaternius-standard' })
+    expect(countHandWeightedTriangles(bodyMesh)).toBe(originalHandTriangleCount)
+    const getUpperBodyTriangleCounts = () => upperBodyBands.map((minimumY) => countTrianglesInRegion(
+      bodyMesh,
+      (point) => point.y > minimumY && Math.abs(point.x) < 0.25,
+    ))
+    expect(getUpperBodyTriangleCounts()).toEqual(originalTriangleCounts)
+    const remainingTorsoSideCounts = torsoSides.map((side) => countTrianglesInRegion(
+      bodyMesh,
+      (point) => point.y > 0.8 && point.y < 1.65 && Math.abs(point.x) < 0.25 && point.z * side > 0,
+    ))
+    expect(remainingTorsoSideCounts.every((count, index) => count < originalTorsoSideCounts[index])).toBe(true)
+
+    await manager.setAsset('clothing-head-hood', hoodAsset, { bodyId: 'body', rig: 'quaternius-standard' })
+    expect(getUpperBodyTriangleCounts()).toEqual(originalTriangleCounts)
+    expect(countHandWeightedTriangles(bodyMesh)).toBe(originalHandTriangleCount)
+
+    await manager.setAsset('outfit', rangerOutfitAsset, { bodyId: 'body', rig: 'quaternius-standard' })
+    expect(getUpperBodyTriangleCounts()).toEqual(originalTriangleCounts)
+    expect(countHandWeightedTriangles(bodyMesh)).toBe(originalHandTriangleCount)
+    const rangerTorsoSideCounts = torsoSides.map((side) => countTrianglesInRegion(
+      bodyMesh,
+      (point) => point.y > 0.8 && point.y < 1.65 && Math.abs(point.x) < 0.25 && point.z * side > 0,
+    ))
+    const rangerTorsoRemainingFractions = rangerTorsoSideCounts.map((count, index) => (
+      Number((count / originalTorsoSideCounts[index]).toFixed(2))
+    ))
+    expect(rangerTorsoSideCounts.every((count, index) => count < originalTorsoSideCounts[index])).toBe(true)
+  }, 15000)
 
   it('keeps female Long and Buns hair aligned to the female head', async () => {
     const bodyModel = await loadNormalizedGltf(

@@ -10,8 +10,12 @@ import MessageWindow from "./components/MessageWindow"
 import Background from "./components/Background"
 
 import Appearance from "./pages/Appearance"
+import SpeciesEditor from "./pages/SpeciesEditor"
 import Create from "./pages/Create"
-import Landing from "./pages/Landing"
+import CreatorEntry from "./pages/CreatorEntry"
+import CreatorHub from "./pages/CreatorHub"
+import FoundationSelector from "./pages/FoundationSelector"
+import AgeGender from "./pages/AgeGender"
 
 export const resolveAssetImportPath = (assetPath) => {
   const normalized = typeof assetPath === "string" ? assetPath.trim() : ""
@@ -153,8 +157,14 @@ export default function App() {
 
   // map current app mode to a page
   const pages = {
-    [ViewMode.LANDING]: <Landing />,
+    [ViewMode.LAUNCH]: <CreatorEntry />,
+    [ViewMode.HUB]: <CreatorHub />,
+    [ViewMode.LANDING]: <CreatorHub />,
     [ViewMode.CREATE]: <Create />,
+    [ViewMode.SPECIES_FOUNDATION]: <FoundationSelector creatorContext="species" />,
+    [ViewMode.CHARACTER_SPECIES]: <FoundationSelector creatorContext="character" />,
+    [ViewMode.SPECIES_EDITOR]: <SpeciesEditor />,
+    [ViewMode.CHARACTER_AGE_GENDER]: <AgeGender />,
     [ViewMode.APPEARANCE]: <Appearance confirmDialog={confirmDialog} />,
   }
 
@@ -181,7 +191,7 @@ export default function App() {
     if (lookAtManager != null){
       updateCameraPosition()
       lookAtManager.enabled = true
-      if ([ViewMode.LANDING, ViewMode.CREATE, ViewMode.CLAIM, ViewMode.LOAD, ViewMode.CLAIM, ViewMode.CLAIM].includes(viewMode))
+      if ([ViewMode.LAUNCH, ViewMode.HUB, ViewMode.LANDING, ViewMode.CREATE, ViewMode.SPECIES_FOUNDATION, ViewMode.SPECIES_EDITOR, ViewMode.CHARACTER_SPECIES, ViewMode.CHARACTER_AGE_GENDER, ViewMode.CLAIM, ViewMode.LOAD].includes(viewMode))
         showEnvironmentModels(false)
       else
         showEnvironmentModels(true)
@@ -212,7 +222,7 @@ export default function App() {
       />
       <Background />
       
-      {pages[viewMode] ?? pages[ViewMode.LANDING]}
+      {pages[viewMode] ?? pages[ViewMode.LAUNCH]}
       
     </Fragment>
   )

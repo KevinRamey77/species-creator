@@ -1,0 +1,149 @@
+.shell {
+  --library-ink: #f0e5cf;
+  --library-muted: #b6a58a;
+  --library-brass: #b58a4b;
+  --library-line: rgba(204, 167, 105, 0.23);
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-color: rgba(181, 138, 75, 0.62) rgba(15, 10, 6, 0.55);
+  scrollbar-width: thin;
+  pointer-events: auto;
+  color: var(--library-ink);
+  background:
+    radial-gradient(ellipse at 50% 28%, rgba(255, 217, 159, 0.2), transparent 25%),
+    linear-gradient(90deg, #17110c, #2b2119 17%, #392c20 50%, #2b2119 83%, #17110c);
+  font-family: Inter, "Segoe UI", sans-serif;
+  isolation: isolate;
+}
+
+.shell::-webkit-scrollbar { width: 8px; }
+.shell::-webkit-scrollbar-track { background: rgba(15, 10, 6, 0.55); }
+.shell::-webkit-scrollbar-thumb { border: 1px solid rgba(223, 185, 126, 0.24); background: linear-gradient(180deg, #a77a3e, #68451f); }
+
+.roomImage {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(180deg, rgba(12, 8, 5, 0.48), rgba(17, 10, 5, 0.12) 38%, rgba(13, 8, 5, 0.5)),
+    url("../images/D0B5AA64-8C2C-4787-9D65-859FF6A3DFB0.PNG");
+  background-size: 100% 100%, auto 160%;
+  background-position: center, center 47%;
+  background-repeat: no-repeat;
+  filter: brightness(0.64) saturate(0.78) contrast(1.12);
+  pointer-events: none;
+}
+
+.roomImage::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(9, 6, 4, 0.38), transparent 20% 80%, rgba(9, 6, 4, 0.38)),
+    radial-gradient(ellipse at 50% 40%, transparent 18%, rgba(7, 4, 3, 0.55) 100%);
+  content: "";
+}
+
+.windowArch {
+  top: 8vh;
+  left: 50%;
+  width: clamp(190px, 23vw, 340px);
+  height: min(58vh, 530px);
+  transform: translateX(-50%);
+  clip-path: polygon(50% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
+  border: 0;
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(25, 16, 10, 0.94) 48%, rgba(156, 119, 75, 0.65) 49%, transparent 51%),
+    linear-gradient(0deg, transparent 48%, rgba(25, 16, 10, 0.94) 49%, rgba(156, 119, 75, 0.65) 50%, transparent 52%),
+    linear-gradient(135deg, transparent 49.4%, rgba(38, 28, 20, 0.8) 49.8% 50.4%, transparent 50.8%),
+    linear-gradient(45deg, transparent 49.4%, rgba(38, 28, 20, 0.8) 49.8% 50.4%, transparent 50.8%),
+    radial-gradient(ellipse at 50% 38%, rgba(219, 198, 158, 0.72), rgba(116, 139, 145, 0.5) 29%, rgba(35, 51, 54, 0.82) 67%, #21170f 100%);
+  box-shadow: inset 0 0 0 9px #26180f, inset 0 0 0 12px rgba(190, 143, 82, 0.65), inset 0 0 42px rgba(10, 7, 4, 0.74), 0 14px 48px rgba(0, 0, 0, 0.5);
+  opacity: 0.74;
+}
+
+.windowArch span {
+  position: absolute;
+  inset: 0;
+  border-top: 5px solid rgba(188, 144, 84, 0.7);
+  background: linear-gradient(180deg, rgba(216, 191, 144, 0.08), transparent 55%);
+}
+
+.shell::before,
+.shell::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.shell::before {
+  background:
+    linear-gradient(180deg, rgba(8, 5, 3, 0.42), transparent 18% 72%, rgba(8, 5, 3, 0.42)),
+    linear-gradient(90deg, rgba(8, 5, 3, 0.48), transparent 16% 84%, rgba(8, 5, 3, 0.48)),
+    radial-gradient(ellipse at 50% 38%, transparent 15%, rgba(5, 3, 2, 0.18) 59%, rgba(5, 3, 2, 0.75) 100%);
+}
+
+.shell::after {
+  opacity: 0.14;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.wallTexture,
+.candlelight,
+.roomDepth {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.wallTexture {
+  opacity: 0.24;
+  background:
+    repeating-linear-gradient(2deg, transparent 0 37px, rgba(232, 196, 143, 0.025) 38px, transparent 39px),
+    radial-gradient(ellipse at 50% 25%, rgba(238, 194, 126, 0.08), transparent 47%);
+  background-position: 0 0, 0 0, 0 0;
+}
+
+.candlelight {
+  background:
+    radial-gradient(ellipse at 13% 18%, rgba(255, 168, 71, 0.22), transparent 12%),
+    radial-gradient(ellipse at 87% 28%, rgba(255, 174, 79, 0.19), transparent 13%),
+    radial-gradient(ellipse at 50% 26%, rgba(255, 227, 177, 0.1), transparent 28%);
+  mix-blend-mode: screen;
+}
+
+.roomDepth {
+  background: linear-gradient(180deg, transparent 0 67%, rgba(10, 6, 3, 0.18) 78%, rgba(7, 4, 2, 0.6) 100%);
+  box-shadow: inset 0 0 12rem rgba(5, 3, 2, 0.58);
+}
+
+.content {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  z-index: 0;
+}
+
+:global(.library-control):focus-visible {
+  outline: 2px solid #e3b86e;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after { scroll-behavior: auto !important; }
+}
+
+@media (max-width: 600px) {
+  .roomImage { background-size: 100% 100%, auto 112%; background-position: center, center 43%; }
+}

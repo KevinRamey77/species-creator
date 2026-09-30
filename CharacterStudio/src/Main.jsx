@@ -6,6 +6,7 @@ import * as THREE from "three"
 import { AudioProvider } from "./context/AudioContext"
 
 import { AccountProvider } from "./context/AccountContext"
+import { CreatorDataProvider } from "./context/CreatorDataContext"
 import { SceneContext, SceneProvider } from "./context/SceneContext"
 import { ViewProvider } from "./context/ViewContext"
 
@@ -512,14 +513,16 @@ const NormalApplication = () => (
       <LanguageProvider>
         <AudioProvider>
           <ViewProvider>
-            <SceneProvider>
-              <SoundProvider>
-                <ClothingTracePanel />
-                <Suspense fallback={<main style={{ padding: "2rem", color: "white", fontFamily: "sans-serif" }}>Loading Character Studio...</main>}>
-                  <App />
-                </Suspense>
-              </SoundProvider>
-            </SceneProvider>
+            <CreatorDataProvider>
+              <SceneProvider>
+                <SoundProvider>
+                  <ClothingTracePanel />
+                  <Suspense fallback={<main style={{ padding: "2rem", color: "white", fontFamily: "sans-serif" }}>Loading Character Studio...</main>}>
+                    <App />
+                  </Suspense>
+                </SoundProvider>
+              </SceneProvider>
+            </CreatorDataProvider>
           </ViewProvider>
         </AudioProvider>
       </LanguageProvider>
